@@ -1,178 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Image to Matrix</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image to Matrix</title>
 </head>
 <body>
 
-<input type="file" id="fileInput" accept="image/*">
-<canvas id="canvas" style="display: none;"></canvas>
+  <input type="file" id="fileInput" accept="image/*">
+  <canvas id="canvas" style="display: none;"></canvas>
 
-<div>
-  <h2>Imagem Original</h2>
-  <img id="originalImage">
-</div>
+  <div>
+    <h2>Imagem Original</h2>
+    <img id="originalImage">
+  </div>
 
-<div>
-  <h2>Imagem com Brilho Aumentado</h2>
-  <img id="brightenedImage">
-</div>
+  <div id="brightenedDiv" style="display: none;">
+    <h2>Imagem com Brilho Aumentado</h2>
+    <img id="brightenedImage">
+  </div>
 
-<div>
-  <h2>Imagem em Escala de Cinza</h2>
-  <img id="grayImage">
-</div>
+  <div id="grayDiv" style="display: none;">
+    <h2>Imagem em Escala de Cinza</h2>
+    <img id="grayImage">
+  </div>
 
-<div>
-    <h2>Imagem Negative</h2>
-    <img id="imgNegative">
-</div>
+  <div id="negativeDiv" style="display: none;">
+    <h2>Imagem Negativa</h2>
+    <img id="negativeImage">
+  </div>
 
+  <script>
+    function imageToMatrix(imageFile) {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
 
-<script>
-function imageToMatrix(imageFile) {
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-
-    const img = new Image();
-    img.onload = function() {
+      const img = new Image();
+      img.onload = function() {
         canvas.width = img.width;
         canvas.height = img.height;
+
+        const width = canvas.width;
+        const height = canvas.height;
+
         ctx.drawImage(img, 0, 0);
 
         const imageData = ctx.getImageData(0, 0, img.width, img.height);
         const pixels = imageData.data;
         const matrix = [];
 
-        for (let i = 0; i < pixels.length; i += 4) {
-            const red = pixels[i];
-            const green = pixels[i + 1];
-            const blue = pixels[i + 2];
-            const alpha = pixels[i + 3];
+        for (let i = 0; i < height; i++) {
+          for (let j = 0; j < width; j++) {
+            const index = (i * width + j) * 4;
+            const red = pixels[index];
+            const green = pixels[index + 1];
+            const blue = pixels[index + 2];
+            const alpha = pixels[index + 3];
             matrix.push([red, green, blue, alpha]);
+          }
         }
         
-        const brightenedMatrix = brilho(matrix);
-        const grayMatrix = gray(matrix);
-        displayImages(img, brightenedMatrix, grayMatrix);
-    };
+        const brightenedMatrix = brilho(matrix, img.width, img.height, 50); // Adicionando brilho inicial de 50
+        const grayMatrix = gray(matrix, width, height);
+        const negativeMatrix = negative(matrix, width, height);
+        console.log('Matriz Original:', matrix);
+        console.log('Matriz com Brilho:', brightenedMatrix);
+        console.log('Matriz em Escala de Cinza:', grayMatrix);
+        console.log('Matriz Negativa:', negativeMatrix);
+        displayImages(img, brightenedMatrix, grayMatrix, negativeMatrix);
 
-    img.src = URL.createObjectURL(imageFile);
+      };
+
+      img.src = URL.createObjectURL(imageFile);
+    }
+    
+    function brilho(matrix, width, height, factor) {
+      const brightenedMatrix = [];
+      for (let i = 0; i < height; i++) {
+          for (let j = 0; j < width; j++) {
+              const index = (i * width + j);
+              const red = Math.min(255, matrix[index][0] + factor);
+              const green = Math.min(255, matrix[index][1] + factor);
+              const blue = Math.min(255, matrix[index][2] + factor);
+              const alpha = matrix[index][3];
+              brightenedMatrix.push([red, green, blue, alpha]);
+          }
+      }
+      return brightenedMatrix;
+    }
+
+    function negative(matrix, width, height) {
+      const negativeMatrix = [];
+
+      for (let i = 0; i < height; i++) {
+          for (let j = 0; j < width; j++) {
+              const index = (i * width + j);
+              const red = 255 - matrix[index][0];
+              const green = 255 - matrix[index][1];
+              const blue = 255 - matrix[index][2];
+              const alpha = matrix[index][3];
+              negativeMatrix.push([red, green, blue, alpha]);
+          }
+      }
+
+      return negativeMatrix;
+    }
+
+    function gray(matrix, width, height) {
+      const grayMatrix = [];
+      for (let i = 0; i < height; i++) {
+          for (let j = 0; j < width; j++) {
+              const index = (i * width + j);
+              const red = matrix[index][0];
+              const green = matrix[index][1];
+              const blue = matrix[index][2];
+              const imgGray = Math.round(red * 0.3 + green * 0.59 + blue * 0.11);
+              const alpha = matrix[index][3];
+              grayMatrix.push([imgGray, imgGray, imgGray, alpha]);
+          }
+      }
+      return grayMatrix
+    }
+
+function displayImages(originalImg, brightenedMatrix, grayMatrix, negativeMatrix) {
+  document.getElementById('originalImage').src = originalImg.src;
+  document.getElementById('brightenedImage').src = matrixToDataURL(brightenedMatrix, originalImg.width, originalImg.height);
+  document.getElementById('grayImage').src = matrixToDataURL(grayMatrix, originalImg.width, originalImg.height);
+  document.getElementById('negativeImage').src = matrixToDataURL(negativeMatrix, originalImg.width, originalImg.height);
+
+  document.getElementById('brightenedDiv').style.display = 'block';
+  document.getElementById('grayDiv').style.display = 'block';
+  document.getElementById('negativeDiv').style.display = 'block';
 }
 
-function brilho(matrix) {
-    const brightenedMatrix = [];
-    for (let i = 0; i < matrix.length; i++) {
-        const pixel = matrix[i];
-        const red = Math.min(pixel[0] + 50, 255);
-        const green = Math.min(pixel[1] + 50, 255);
-        const blue = Math.min(pixel[2] + 50, 255);
-        const alpha = pixel[3];
-        brightenedMatrix.push([red, green, blue, alpha]);
-    }
-    console.log(brightenedMatrix)
-    return brightenedMatrix;
-}
+function matrixToDataURL(matrix, width, height) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
 
-function negativo(matrix) {
-    const negativeMatrix = [];
-    for (let i = 0; i < matrix.length; i++) {
-        const pixel = matrix[i];
-        const red = Math.min(pixel[0] - 255, 255);
-        const green = Math.min(pixel[1] - 255, 255);
-        const blue = Math.min(pixel[2] - 255, 255);
-        const alpha = pixel[3];
-        negativeMatrix.push([red, green, blue, alpha]);
-    }
-    console.log(negativeMatrix)
-    return negativeMatrix;
-}
+  const imageData = ctx.createImageData(width, height);
+  const pixels = imageData.data;
 
+  for (let i = 0; i < matrix.length; i++) {
+    const pixel = matrix[i];
+    pixels[i * 4] = pixel[0]; // red
+    pixels[i * 4 + 1] = pixel[1]; // green
+    pixels[i * 4 + 2] = pixel[2]; // blue
+    pixels[i * 4 + 3] = pixel[3]; // alpha
+  }
 
-function gray(matrix){
-    const grayMatrix = [];
-    for (let i = 0; i < matrix.length; i++) {
-        const pixel = matrix[i];
-        const red = pixel[0];
-        const green = pixel[1];
-        const blue = pixel[2];
+  ctx.putImageData(imageData, 0, 0);
 
-        // Calculo ponderado para escala de cinza
-        const imgGray = (red * 0.3 + green * 0.59 + blue * 0.11);
-        grayMatrix.push([imgGray, imgGray, imgGray, pixel[3]]);
-    }
-    return grayMatrix;
-}
-
-function displayImages(originalImg, brightenedMatrix, grayMatrix,negativeMatrix) {
-    const canvas = document.createElement('canvas');
-    canvas.width = originalImg.width;
-    canvas.height = originalImg.height;
-    const ctx = canvas.getContext('2d');
-
-    const imageData = ctx.createImageData(originalImg.width, originalImg.height);
-    const pixels = imageData.data;
-
-    for (let i = 0; i < brightenedMatrix.length; i++) {
-        const pixel = brightenedMatrix[i];
-        pixels[i * 4] = pixel[0]; // red
-        pixels[i * 4 + 1] = pixel[1]; // green
-        pixels[i * 4 + 2] = pixel[2]; // blue
-        pixels[i * 4 + 3] = pixel[3]; // alpha
-    }
-
-    ctx.putImageData(imageData, 0, 0);
-
-    document.getElementById('originalImage').src = originalImg.src;
-    document.getElementById('brightenedImage').src = canvas.toDataURL();
-
-    // Exibir a imagem em escala de cinza
-    const grayCanvas = document.createElement('canvas');
-    grayCanvas.width = originalImg.width;
-    grayCanvas.height = originalImg.height;
-    const grayCtx = grayCanvas.getContext('2d');
-
-    const grayImageData = grayCtx.createImageData(originalImg.width, originalImg.height);
-    const grayPixels = grayImageData.data;
-
-    for (let i = 0; i < grayMatrix.length; i++) {
-        const pixel = grayMatrix[i];
-        grayPixels[i * 4] = pixel[0]; // red
-        grayPixels[i * 4 + 1] = pixel[1]; // green
-        grayPixels[i * 4 + 2] = pixel[2]; // blue
-        grayPixels[i * 4 + 3] = pixel[3]; // alpha
-    }
-
-    grayCtx.putImageData(grayImageData, 0, 0);
-    document.getElementById('grayImage').src = grayCanvas.toDataURL();
-
-    const negativeCanvas = document.createElement('canvas');
-    negativeCanvas.width = originalImg.width;
-    negativeCanvas.height = originalImg.height;
-    const negativeCtx = negativeCanvas.getContext('2d');
-
-    const negativeImageData = negativeCtx.createImageData(originalImg.width, originalImg.height);
-    const negativePixels = negativeImageData.data;
-
-    for (let i = 0; i < negativeMatrix.length; i++) {
-        const pixel = negativeMatrix[i];
-        negativePixels[i * 4] = pixel[0]; // red
-        negativePixels[i * 4 + 1] = pixel[1]; // green
-        negativePixels[i * 4 + 2] = pixel[2]; // blue
-        negativePixels[i * 4 + 3] = pixel[3]; // alpha
-    }
-
-    negativeCtx.putImageData(negativeImageData, 0, 0);
-    document.getElementById('imgNegative').src = negativeCanvas.toDataURL();
+  return canvas.toDataURL();
 }
 
 document.getElementById('fileInput').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    if (file) {
-        imageToMatrix(file);
-    }
+  const file = event.target.files[0];
+  if (file) {
+    imageToMatrix(file);
+  }
 });
 </script>
 
