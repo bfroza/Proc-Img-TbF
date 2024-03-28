@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="nav-bar">
+    <div id="left-icon">
+        <a href="../html/index.html"><img src="../img/imagem.png" alt=""></a>
+    </div>
+    <ul>
+      <li><a href="../html/index.html">Início</a></li>
+      <li><a href="../html/color_picker.html">Color Picker</a></li>
+      <li><a href="postagem.html">Color Picker</a></li>
+      <li><a href="postagem.html">Color Picker</a></li>
+      <li><a href="postagem.html">Color Picker</a></li>
+      <li><a href="postagem.html">Color Picker</a></li>
+    </ul>
+    <div id="right-icon"></div>
+  </header>
+
+  <input type="file" id="fileInput" accept="image/*">
+  <canvas id="canvas" style="display: none;"></canvas>
+
+  <main class="container">
+    <div class="image-container">
+      <div class="select-img">
+        <h1>Imagem Original</h1>
+        <div class="presentation">
+          <img id="originalImage" src="../img/img5f0c80e0bd9d08.31973740.jpg" alt="">
+        </div>
+      </div>
+      <div class="select-img">
+        <h1>Botões de escolha</h1>
+        <div class="buttons">
+          <button id="negativeButton" type="button">Negativo</button>
+          <button id="grayButton" type="button">Escala de Cinza</button>
+          <button id="binarizeButton" type="button">Binarização</button>
+          <button id="normalButton" type="button">Normal</button>
+          <h3>Alterar Luminosidade</h3>
+          <input type="range" name="" id="">
+        </div>
+      </div>
+      <div class="select-img">
+        <h1>Imagem Modificada</h1>
+        <div class="presentation">
+            <img id="modifiedImage" class="modified-image" src="../img/img5f0c80e0bd9d08.31973740.jpg" alt="">
+        </div>
+    </div>
+
+      </div>
+    </div>
+  </main>
+
+<script defer>
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById('fileInput').addEventListener('click', function() {
+        this.value = null; 
+    });
+
+    document.getElementById('fileInput').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            imageToMatrix(file);
+        }
+    });
+
+    document.getElementById('negativeButton').addEventListener('click', function() {
+        applyFilter('negative');
+    });
+
+    document.getElementById('grayButton').addEventListener('click', function() {
+        applyFilter('gray');
+    });
+
+    document.getElementById('binarizeButton').addEventListener('click', function() {
+        applyFilter('binarize');
+    });
+    document.getElementById('normalButton').addEventListener('click', function() {
+        applyFilter('normal');
+    });
+});
+
+function applyFilter(filterType) {
+    const originalImg = document.getElementById('originalImage');
+    const canvas = document.createElement('canvas');
+    canvas.width = originalImg.naturalWidth; // Use naturalWidth
+    canvas.height = originalImg.naturalHeight; // Use naturalHeight
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(originalImg, 0, 0);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let modifiedMatrix;
+
+    switch (filterType) {
+        case 'negative':
+            modifiedMatrix = negative(matrixFromImageData(imageData), canvas.width, canvas.height);
+            break;
+        case 'gray':
+            modifiedMatrix = gray(matrixFromImageData(imageData), canvas.width, canvas.height);
+            break;
+        case 'binarize':
+            modifiedMatrix = binarize(matrixFromImageData(imageData), canvas.width, canvas.height, 127);
+            break;
+        case 'normal':
+            modifiedMatrix = original(matrixFromImageData(imageData), canvas.width, canvas.height);
+            break;
+        default:
+            return;
+    }
+
+    document.getElementById('modifiedImage').src = matrixToDataURL(modifiedMatrix, canvas.width, canvas.height);
+}
+
+
+function matrixFromImageData(imageData) {
+    const pixels = imageData.data;
+    const matrix = [];
+
+    for (let i = 0; i < pixels.length; i += 4) {
+        const red = pixels[i];
+        const green = pixels[i + 1];
+        const blue = pixels[i + 2];
+        const alpha = pixels[i + 3];
+        matrix.push([red, green, blue, alpha]);
+    }
+
+    return matrix;
+}
+
+function original(matrix, width, height) {
+    const originalMatrix = [];
+    for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+            const index = i * width + j;
+            const red = matrix[index][0];
+            const green = matrix[index][1];
+            const blue = matrix[index][2];
+            const alpha = matrix[index][3];
+            originalMatrix.push([red, green, blue, alpha]);
+        }
+    }
+    return originalMatrix;
+}
+
+
+function gray(matrix, width, height) {
+    const grayMatrix = [];
+    for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+            const index = (i * width + j);
+            const red = matrix[index][0];
+            const green = matrix[index][1];
+            const blue = matrix[index][2];
+            const imgGray = Math.round(red * 0.3 + green * 0.59 + blue * 0.11);
+            const alpha = matrix[index][3];
+            grayMatrix.push([imgGray, imgGray, imgGray, alpha]);
+        }
+    }
+    return grayMatrix;
+}
+
+function negative(matrix, width, height) {
+    const negativeMatrix = [];
+    for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+            const index = (i * width + j);
+            const red = 255 - matrix[index][0];
+            const green = 255 - matrix[index][1];
+            const blue = 255 - matrix[index][2];
+            const alpha = matrix[index][3];
+            negativeMatrix.push([red, green, blue, alpha]);
+        }
+    }
+    return negativeMatrix;
+}
+
+function binarize(matrix, width, height, threshold) {
+    const binarizedMatrix = [];
+    for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+            const index = (i * width + j);
+            const red = matrix[index][0];
+            const green = matrix[index][1];
+            const blue = matrix[index][2];
+            const alpha = matrix[index][3];
+            const grayValue = (red + green + blue) / 3;
+            const binaryValue = grayValue > threshold ? 255 : 0;
+            binarizedMatrix.push([binaryValue, binaryValue, binaryValue, alpha]);
+        }
+    }
+    return binarizedMatrix;
+}
+
+function matrixToDataURL(matrix, width, height) {
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+
+    const imageData = ctx.createImageData(width, height);
+    const pixels = imageData.data;
+
+    for (let i = 0; i < matrix.length; i++) {
+        const pixel = matrix[i];
+        pixels[i * 4] = pixel[0]; // red
+        pixels[i * 4 + 1] = pixel[1]; // green
+        pixels[i * 
+        4 + 2] = pixel[2]; // blue
+        pixels[i * 4 + 3] = pixel[3]; // alpha
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+
+    return canvas.toDataURL();
+}
+
+function imageToMatrix(imageFile) {
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    img.onload = function() {
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        const width = canvas.width;
+        const height = canvas.height;
+
+        ctx.drawImage(img, 0, 0);
+
+        const imageData = ctx.getImageData(0, 0, img.width, img.height);
+        const pixels = imageData.data;
+        const matrix = [];
+
+        for (let i = 0; i < height; i++) {
+            for (let j = 0; j < width; j++) {
+                const index = (i * width + j) * 4;
+                const red = pixels[index];
+                const green = pixels[index + 1];
+                const blue = pixels[index + 2];
+                const alpha = pixels[index + 3];
+                matrix.push([red, green, blue, alpha]);
+            }
+        }
+
+        const grayMatrix = gray(matrix, width, height);
+        const negativeMatrix = negative(matrix, width, height);
+        const binarizedMatrix = binarize(matrix, width, height, 202);
+        const originalMatrix = original(matrix, width,height)
+
+        displayImages(img, grayMatrix, negativeMatrix, binarizedMatrix,originalMatrix);
+    };
+
+    img.src = URL.createObjectURL(imageFile);
+}
+
+function displayImages(originalImg, grayMatrix, negativeMatrix, binarizedMatrix,originalMatrix) {
+    document.getElementById('originalImage').src = originalImg.src;
+    document.getElementById('modifiedImage').src = matrixToDataURL(originalMatrix, originalImg.width, originalImg.height);
+}
+
+</script>
+</body>
+</html>
