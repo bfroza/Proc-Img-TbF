@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+    <link rel="stylesheet" href="../css/soma.css">
+    <script src="../js/soma.js" defer></script>
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+</head>
+
+<body>
+    <header class="nav-bar">
+        <div id="left-icon">
+            <a href="../html/index.html"><img src="../img/imagem.png" alt=""></a>
+        </div>
+        <ul>
+            <li><a href="../html/index.html">Início</a></li>
+            <li><a href="../html/color_picker.html">Color Picker</a></li>
+            <li><a href="../html/soma.html">Soma de imagens</a></li>
+            <li><a href="postagem.html">Color Picker</a></li>
+            <li><a href="postagem.html">Color Picker</a></li>
+            <li><a href="postagem.html">Color Picker</a></li>
+        </ul>
+        <div id="right-icon"> </div>
+    </header>
+    <main class="container">
+        <div class="image-container">
+            <div class="select-img">
+                <h1>Imagem 1</h1>
+                <h2>+</h2>
+                <div class="presentation">
+                    <img id="originalImage" src="../img/img5f0c80e0bd9d08.31973740.jpg" alt="">
+                    <label for="fileInput1" class="custom-file-upload">Escolher Arquivo<input type="file"
+                            id="fileInput1" accept="image/*"></label>
+                    <canvas id="canvas1" style="display: none;"></canvas>
+                </div>
+            </div>
+            <div class="select-img">
+                <h1>Imagem 2</h1>
+                <h2>+</h2>
+                <div class="presentation">
+                    <img id="originalImage1" src="../img/img5f0c80e0bd9d08.31973740.jpg" alt="">
+                    <label for="fileInput2" class="custom-file-upload">Escolher Arquivo<input type="file"
+                            id="fileInput2" accept="image/*"></label>
+                    <canvas id="canvas2" style="display: none;"></canvas>
+                </div>
+            </div>
+            <div class="select-img">
+                <h1>Imagens Juntas</h1>
+                <h2>=</h2>
+                <div class="presentation">
+                    <img id="modifiedImage" class="modified-image" src="../img/img5f0c80e0bd9d08.31973740.jpg" alt="">
+                    <button id="downloadButton" class="custom-file-uploads">Download Image</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

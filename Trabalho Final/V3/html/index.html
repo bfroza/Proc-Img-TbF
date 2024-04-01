@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/script.js" defer></script>
+  <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+</head>
+<body>
+  <header class="nav-bar">
+    <div id="left-icon">
+        <a href="../html/index.html"><img src="../img/imagem.png" alt=""></a>
+    </div>
+    <ul>
+      <li><a href="../html/index.html">Início</a></li>
+      <li><a href="../html/color_picker.html">Color Picker</a></li>
+      <li><a href="../html/soma.html">Soma de imagens</a></li>
+      <li><a href="postagem.html">Color Picker</a></li>
+      <li><a href="postagem.html">Color Picker</a></li>
+      <li><a href="postagem.html">Color Picker</a></li>
+    </ul>
+    <div id="right-icon"> </div>
+  </header>
+
+  <input type="file" id="fileInput" accept="image/*">
+  <canvas id="canvas" style="display: none;"></canvas>
+  
+
+  <main class="container">
+    <div class="image-container">
+      <div class="select-img">
+        <h1>Imagem Original</h1>
+        <div class="presentation">
+          <img id="originalImage" src="../img/img5f0c80e0bd9d08.31973740.jpg" alt="">
+        </div>
+      </div>
+      <div class="select-img">
+        <h1>Botões de escolha</h1>
+        <div class="buttons">
+          <button id="negativeButton" type="button">Negativo</button>
+          <button id="grayButton" type="button">Escala de Cinza</button>
+          <button id="binarizeButton" type="button">Binarização</button>
+          <button id="normalButton" type="button">Normal</button>
+          <div class="div">
+            <box-icon name='left-arrow' type='solid' ></box-icon>
+            <box-icon name='right-arrow' type='solid'></box-icon>
+            <box-icon name='up-arrow' type='solid' ></box-icon>
+            <box-icon name='down-arrow' type='solid' ></box-icon>
+          </div>
+          
+
+          <h3>Alterar Luminosidade</h3>
+          <input type="range" name="" id="">
+        </div>
+      </div>
+      <div class="select-img">
+        <h1>Imagem Modificada</h1>
+        <div class="presentation">
+            <img id="modifiedImage" class="modified-image" src="../img/img5f0c80e0bd9d08.31973740.jpg" alt="">
+            <div class="button-download">
+                <button id="downloadButton">Download</button>
+                <select name="select-tipo-img" id="select-tipo-imgs">
+                  <option value="jpg">JPG</option>
+                  <option value="png">PNG</option>
+                  <option value="tiff">TIFF</option>
+                  <option value="bmp">BMP</option>
+                  <option value="heif">HEIF</option>
+                  <option value="raw">RAW</option>
+                </select>
+            </div>
+            
+
+        </div>
+    </div>
+
+      </div>
+    </div>
+  </main>
+</body>
+</html>
