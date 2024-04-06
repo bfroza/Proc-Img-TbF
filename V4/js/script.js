@@ -1,6 +1,8 @@
 let workingMatrix = [];
+let brightness_last_value = 0;
 
 document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("range_brightness").value = 1;
     workingMatrix = imageToMatrix();
     document.getElementById('fileInput').addEventListener('click', function () {
         this.value = null;
@@ -17,13 +19,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
-    document.getElementById('range_id').addEventListener('change', function () {
-        const brightness_value = document.getElementById('range_id').value;
+    document.getElementById('range_brightness').addEventListener('change', function () {
+        const brightness_value = document.getElementById('range_brightness').value;
         const p = document.getElementById('p').innerText = brightness_value ;
     });
     
-    document.getElementById('range_id_binarize').addEventListener('change', function () {
-        const limiar = document.getElementById('range_id_binarize').value
+    document.getElementById('range_binarize').addEventListener('change', function () {
+        const limiar = document.getElementById('range_binarize').value
         const p1 = document.getElementById('p1').innerText = limiar ;
     });
 
@@ -35,11 +37,11 @@ document.addEventListener("DOMContentLoaded", function () {
         applyFilter('gray');
     });
 
-    document.getElementById('binarizeButton').addEventListener('click', function () {
+    document.getElementById('range_binarize').addEventListener('change', function () {
         applyFilter('binarize');
     });
 
-    document.getElementById('brightnessButton').addEventListener('click', function () {
+    document.getElementById('range_brightness').addEventListener('change', function () {
         applyFilter('brightness');
     });
     document.getElementById('normalButton').addEventListener('click', function () {
@@ -124,12 +126,13 @@ function applyFilter(filterType) {
     const imageData = ctx.getImageData(0, 0, width, height);
     let modifiedMatrix = [];
     const originalMatrix =  workingMatrix;
-    const brightness_value = document.getElementById('range_id').value
-    const limiar = document.getElementById('range_id_binarize').value
+    const brightness_value = document.getElementById('range_brightness').value
+    const limiar = document.getElementById('range_binarize').value
     switch (filterType) {
         case 'negative':
             modifiedMatrix = negative(originalMatrix, width, height);
             workingMatrix = modifiedMatrix;
+            brightness_last_value = 0;
             break;
         case 'gray':
             modifiedMatrix = gray(originalMatrix, width, height);
@@ -141,8 +144,8 @@ function applyFilter(filterType) {
             workingMatrix = modifiedMatrix;
             return;
         case 'brightness':
-            const copyOriginalMatrix = originalMatrix
-            modifiedMatrix = brightness(copyOriginalMatrix, width, height, brightness_value);
+            modifiedMatrix = brightness(originalMatrix, width, height, brightness_value);
+            workingMatrix = modifiedMatrix;
             document.getElementById('modifiedImage').src = matrixToDataURL(modifiedMatrix, width, height, brightness_value);
             return;
         case 'rotateLeft':
@@ -194,10 +197,10 @@ function matrixToDataURL(modifiedMatrix, width, height) {
         for (let j = 0; j < width; j++) {
             const index = (i * width + j) * 4;
             const rgba = modifiedMatrix[i][j];
-            modifiedArray[index] = rgba[0];
-            modifiedArray[index + 1] = rgba[1];
-            modifiedArray[index + 2] = rgba[2];
-            modifiedArray[index + 3] = rgba[3];
+            modifiedArray[index] = max_min(rgba[0]);
+            modifiedArray[index + 1] = max_min(rgba[1]);
+            modifiedArray[index + 2] = max_min(rgba[2]);
+            modifiedArray[index + 3] = max_min(rgba[3]);
         }                
     }
     ctx.putImageData(imageData, 0, 0);
@@ -213,25 +216,28 @@ function negative(originalMatrix, width, height) {
             let green = 255 - originalMatrix[i][j][1];
             let blue = 255 - originalMatrix[i][j][2];
             const alpha = originalMatrix[i][j][3];
-            negativeMatrix[i][j] = [max_min(red), max_min(green), max_min(blue), alpha];
+            negativeMatrix[i][j] = [red, green, blue, alpha];
         }
     }
     return negativeMatrix;
 }
 
-function brightness(copyOriginalMatrix, width, height, brightness_value) {
+function brightness(originalMatrix, width, height, brightness_value) {
 
     const brightnessMatrix = [];
     for (let i = 0; i < height; i++) {
         brightnessMatrix[i] = [];
         for (let j = 0; j < width; j++) {
-            let red = parseInt(brightness_value) + copyOriginalMatrix[i][j][0];
-            let green = parseInt(brightness_value) + copyOriginalMatrix[i][j][1];
-            let blue = parseInt(brightness_value) + copyOriginalMatrix[i][j][2];
-            const alpha = copyOriginalMatrix[i][j][3];
-            brightnessMatrix[i][j] = [max_min(red), max_min(green), max_min(blue), alpha];
+            let red = parseInt(brightness_value - brightness_last_value) + originalMatrix[i][j][0];
+            let green = parseInt(brightness_value - brightness_last_value) + originalMatrix[i][j][1];
+            let blue = parseInt(brightness_value - brightness_last_value) + originalMatrix[i][j][2];
+            const alpha = originalMatrix[i][j][3];
+            brightnessMatrix[i][j] = [red, green, blue, alpha];
+           
         }
+       
     }
+    brightness_last_value = brightness_value;
     return brightnessMatrix;
 }
 
@@ -245,7 +251,7 @@ function gray(originalMatrix, width, height) {
             const blue = originalMatrix[i][j][2];
             const alpha = originalMatrix[i][j][3];
             let grayPixel = Math.round(red * 0.3 + green * 0.59 + blue * 0.11);
-            grayMatrix[i][j] = [max_min(grayPixel), max_min(grayPixel), max_min(grayPixel), alpha];
+            grayMatrix[i][j] = [grayPixel, grayPixel, grayPixel, alpha];
         }
     }
     return grayMatrix;
@@ -262,60 +268,10 @@ function binarize(originalMatrix, width, height,limiar) {
             const alpha = originalMatrix[i][j][3];
             const grayPixel = (red + green + blue) / 3;
             let binaryPixel = grayPixel > limiar ? 255 : 0;
-            binayMatrix[i][j] = [max_min(binaryPixel), max_min(binaryPixel), max_min(binaryPixel), alpha];
+            binayMatrix[i][j] = [binaryPixel, binaryPixel, binaryPixel, alpha];
         }
     }
     return binayMatrix;
-}
-
-
-function rotateLeft(originalMatrix, width, height) {
-    const rotateLeft = [];
-    for (let i = 0; i < height; i++) {
-        rotateLeft[i] = [];
-        for (let j = width - 1; j >= 0; j--) {
-            const red = originalMatrix[j][i][0];
-            const green = originalMatrix[j][i][1];
-            const blue = originalMatrix[j][i][2];
-            const alpha = originalMatrix[j][i][3];
-            rotateLeft[i][height - 1 - j] = [red, green, blue, alpha];
-        }
-    }
-    return rotateLeft;
-}
-
-
-function rotateRight(originalMatrix, width, height) {
-    const rotateRight = [];
-    for (let i = 0; i < width; i++) {
-        rotateRight[i] = [];
-        for (let j = height - 1; j >= 0; j--) {
-            const red = originalMatrix[i][j][0];
-            const green = originalMatrix[i][j][1];
-            const blue = originalMatrix[i][j][2];
-            const alpha = originalMatrix[i][j][3];
-            rotateRight[i][height - 1 - j] = [red, green, blue, alpha];
-        }
-    }
-    return rotateRight;
-}
-
-
-
-
-function flipVertical(originalMatrix, width, height) {
-    const flipVertical = [];
-    for (let i = 0; i < width; i++) {
-        flipVertical[i] = [];
-        for (let j = height - 1; j >= 0; j--) {
-            const red = originalMatrix[i][j][0];
-            const green = originalMatrix[i][j][1];
-            const blue = originalMatrix[i][j][2];
-            const alpha = originalMatrix[i][j][3];
-            flipVertical[i][height - 1 - j] = [red, green, blue, alpha];
-        }
-    }
-    return flipVertical;
 }
 
 

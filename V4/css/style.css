@@ -193,7 +193,7 @@ body {
 }
 
 
-#range_id, #range_id_binarize{
+#range_brightness, #range_binarize{
   width: 200px;
 
 }
