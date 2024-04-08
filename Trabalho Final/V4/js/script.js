@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     document.getElementById('fileInput_2').addEventListener('click', function () {
         this.value = null;
+        
     });
 
     document.getElementById('fileInput').addEventListener('change', async function (event) {
@@ -35,12 +36,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById('range_brightness').addEventListener('change', function () {
         const brightness_value = document.getElementById('range_brightness').value;
-        const p = document.getElementById('p').innerText = brightness_value ;
+        const brightness_label = document.getElementById('brightness_label').innerText = brightness_value ;
     });
     
     document.getElementById('range_binarize').addEventListener('change', function () {
         const limiar = document.getElementById('range_binarize').value
-        const p1 = document.getElementById('p1').innerText = limiar ;
+        const binarize_label = document.getElementById('binarize_label').innerText = limiar ;
     });
 
     document.getElementById('negativeButton').addEventListener('click', function () {
@@ -51,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
         applyFilter('gray');
     });
 
-    document.getElementById('range_binarize').addEventListener('change', function () {
+    document.getElementById('binarizeButton').addEventListener('click', function () {
         applyFilter('binarize');
     });
 
@@ -205,7 +206,9 @@ function applyFilter(filterType) {
             document.getElementById('modifiedImage').src = matrixToDataURL(modifiedMatrix, width, height);
             return;
         case 'normal':
-            document.getElementById('modifiedImage').src = document.getElementById('originalImage').src
+            document.getElementById('modifiedImage').src = document.getElementById('originalImage').src;
+            document.getElementById('range_brightness').value = 0;
+            document.getElementById('brightness_label').innerText = 0;
             return;
         default:
             return;

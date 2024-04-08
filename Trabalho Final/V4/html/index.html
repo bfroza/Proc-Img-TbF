@@ -8,7 +8,7 @@
   <script src="../js/script.js" defer></script>
   <link rel="shortcut icon" href="../img/editar.png" type="image/x-icon">
   <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
-  <script src="../js/sweetalert2.all.min.js"></script>
+  <script src="../js/sweetalert2.all.min.js" defer></script>
 </head>
 <body>
   <header class="nav-bar">
@@ -50,6 +50,7 @@
           <button id="negativeButton" type="button">Negativo</button>
           <button id="grayButton" type="button">Escala de Cinza</button>
           <button id="sumButton" type="button">Somar Imagens</button>
+    
           <button id="normalButton" type="button">Normal</button>
           <button id="secundaryButton">Imagem Secundária</button>
           <div class="div">
@@ -61,11 +62,12 @@
           
 
           <h3>Alterar Luminosidade</h3>
-          <p id="p">0</p>
+          <p id="brightness_label">0</p>
           <input type="range" name="" id="range_brightness" value="0" min="-255" max="255">
           <h3>Binarização </h3>
-          <p id="p1">0</p>
-          <input type="range" name="" id="range_binarize" value="0" min="0" max="255">
+          <p id="binazire_label">128</p>
+          <input type="range" name="" id="range_binarize" value="128" min="0" max="255">
+          <button id="binarizeButton">Binarizar</button>
         </div>
       </div>
       <div class="select-img">
