@@ -21,8 +21,8 @@ O código JavaScript presente neste repositório é responsável por aplicar fil
 
 Se você tiver alguma dúvida, sugestão ou problema, sinta-se à vontade para abrir uma issue neste repositório ou entre em contato diretamente conosco:
 
-- Bruno Froza: [brunofroza@example.com](mailto:brunofroza@example.com)
-- Marcio Lima: [marciolima@example.com](mailto:marciolima@example.com)
+- Bruno Froza: [brunofroza@uricer.edu.br](mailto:brunofroza@uricer.edu.br)
+- Marcio Lima: [marciolima@uricer.edu.br](mailto:marciolima@uricer.edu.br)
 
 ## Licença
 
