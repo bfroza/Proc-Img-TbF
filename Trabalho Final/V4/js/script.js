@@ -3,15 +3,22 @@ let workingMatrix2 = [];
 let workingMatrix = [];
 let brightness_last_value = 0;
 let teste = false
-document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("range_brightness").value = 1;
-    
+
+
+document.addEventListener("DOMContentLoaded", function () {    
+    async function firstload () {        
+        workingMatrix = await imageToMatrix();
+        workingMatrix1 = await imageToMatrix();
+        workingMatrix2 = await imageToMatrix();      
+    };
+    firstload();
+
     document.getElementById('fileInput').addEventListener('click', function () {
         this.value = null;
     });
+
     document.getElementById('fileInput_2').addEventListener('click', function () {
         this.value = null;
-        
     });
 
     document.getElementById('fileInput').addEventListener('change', async function (event) {
@@ -19,29 +26,30 @@ document.addEventListener("DOMContentLoaded", function () {
         if (imageFile) {
             document.getElementById('originalImage').src = URL.createObjectURL(imageFile);
             document.getElementById('modifiedImage').src = URL.createObjectURL(imageFile);
-            workingMatrix1 = await imageToMatrix();
             workingMatrix = await imageToMatrix();
+            workingMatrix1 = await imageToMatrix();
         }
     });
-    
+
     document.getElementById('fileInput_2').addEventListener('change', async function (event) {
         const imageFile = event.target.files[0];
         if (imageFile) {
             document.getElementById('originalImage2').src = URL.createObjectURL(imageFile);
-            document.getElementById('modifiedImage').src = URL.createObjectURL(imageFile);
             workingMatrix2 = await imageToMatrix();
         }
     });
-    
 
     document.getElementById('range_brightness').addEventListener('change', function () {
-        const brightness_value = document.getElementById('range_brightness').value;
-        const brightness_label = document.getElementById('brightness_label').innerText = brightness_value ;
+        document.getElementById('brightness_label').innerText = document.getElementById('range_brightness').value;
+        applyFilter('brightness');
     });
-    
+
     document.getElementById('range_binarize').addEventListener('change', function () {
-        const limiar = document.getElementById('range_binarize').value
-        const binarize_label = document.getElementById('binarize_label').innerText = limiar ;
+        document.getElementById('binarize_label').innerText = document.getElementById('range_binarize').value;
+    });
+
+    document.getElementById('binarizeButton').addEventListener('click', function () {
+        applyFilter('binarize');
     });
 
     document.getElementById('negativeButton').addEventListener('click', function () {
@@ -51,14 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('grayButton').addEventListener('click', function () {
         applyFilter('gray');
     });
-
-    document.getElementById('binarizeButton').addEventListener('click', function () {
-        applyFilter('binarize');
-    });
-
-    document.getElementById('range_brightness').addEventListener('change', function () {
-        applyFilter('brightness');
-    });
+    
     document.getElementById('normalButton').addEventListener('click', function () {
         applyFilter('normal');
     });
@@ -82,20 +83,10 @@ document.addEventListener("DOMContentLoaded", function () {
         applyFilter('flipVertical');
     });
 
-
-    document.getElementById('secundaryButton').addEventListener('click', function () {
-        const selectImg = document.getElementById("display");
+    document.getElementById('secundaryButton').addEventListener('click', function () {        
+        document.getElementById("display").classList.toggle("hidden");
         teste = true
-        
-        if (selectImg) {
-            selectImg.classList.toggle("hidden");
-        } else {
-            console.log("Elemento com ID 'display' não encontrado.");
-        }
     });
-
-
-
 });
 
 function imageToMatrix() {
@@ -131,7 +122,7 @@ function imageToMatrix() {
 }
 
 
-function applyFilter(filterType) {            
+function applyFilter(filterType) {
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = true;
@@ -141,30 +132,36 @@ function applyFilter(filterType) {
     const width = img.naturalWidth;
     const height = img.naturalHeight;
     canvas.width = width;
-    canvas.height = height;            
+    canvas.height = height;
     ctx.drawImage(img, 0, 0);
     const imageData = ctx.getImageData(0, 0, width, height);
     let modifiedMatrix = [];
-    const originalMatrix =  workingMatrix;
-   
-    const brightness_value = document.getElementById('range_brightness').value
-    const limiar = document.getElementById('range_binarize').value
+    const originalMatrix = workingMatrix;
 
     
+    
 
-    if(teste){
+
+
+    if (teste) {
         const height1 = workingMatrix1.length;
         const width1 = workingMatrix1[0].length;
 
         const height2 = workingMatrix2.length;
         const width2 = workingMatrix2[0].length;
 
-        if(height1 != height2 && width1 != width2 ){
-        Swal.fire("", "As dimensões das imagens tem q ser a mesma", "warning");
-        return (false);
+        if (height1 != height2 && width1 != width2) {
+            Swal.fire("", "As dimensões das imagens tem q ser a mesma", "warning");
+            return (false);
         }
     }
-    
+
+
+
+
+
+
+
     switch (filterType) {
         case 'negative':
             modifiedMatrix = negative(workingMatrix, width, height);
@@ -176,17 +173,19 @@ function applyFilter(filterType) {
             workingMatrix = modifiedMatrix;
             break;
         case 'binarize':
-            modifiedMatrix = binarize(workingMatrix, width, height,limiar);
-            document.getElementById('modifiedImage').src = matrixToDataURL(modifiedMatrix, width, height,limiar);
+            const limiar = document.getElementById('range_binarize').value
+            modifiedMatrix = binarize(workingMatrix, width, height, limiar);
+            document.getElementById('modifiedImage').src = matrixToDataURL(modifiedMatrix, width, height, limiar);
             workingMatrix = modifiedMatrix;
             return;
         case 'brightness':
+            const brightness_value = document.getElementById('range_brightness').value
             modifiedMatrix = brightness(workingMatrix, width, height, brightness_value);
             workingMatrix = modifiedMatrix;
             document.getElementById('modifiedImage').src = matrixToDataURL(modifiedMatrix, width, height, brightness_value);
             return;
         case 'sum':
-            modifiedMatrix = sum( width, height,workingMatrix1,workingMatrix2);
+            modifiedMatrix = sum(width, height, workingMatrix1, workingMatrix2);
             workingMatrix = modifiedMatrix;
             document.getElementById('modifiedImage').src = matrixToDataURL(modifiedMatrix, width, height);
             return;
@@ -195,7 +194,7 @@ function applyFilter(filterType) {
             document.getElementById('modifiedImage').src = matrixToDataURL(modifiedMatrix, width, height);
             return;
         case 'rotateRight':
-            modifiedMatrix =  rotateRight(originalMatrix, width, height);
+            modifiedMatrix = rotateRight(originalMatrix, width, height);
             break;
         case 'flipHorizontal':
             modifiedMatrix = flipHorizontal(originalMatrix, width, height);
@@ -245,7 +244,7 @@ function matrixToDataURL(modifiedMatrix, width, height) {
             modifiedArray[index + 1] = max_min(rgba[1]);
             modifiedArray[index + 2] = max_min(rgba[2]);
             modifiedArray[index + 3] = max_min(rgba[3]);
-        }                
+        }
     }
     ctx.putImageData(imageData, 0, 0);
     return canvas.toDataURL();
@@ -277,9 +276,9 @@ function brightness(originalMatrix, width, height, brightness_value) {
             let blue = parseInt(brightness_value - brightness_last_value) + originalMatrix[i][j][2];
             const alpha = originalMatrix[i][j][3];
             brightnessMatrix[i][j] = [red, green, blue, alpha];
-           
+
         }
-       
+
     }
     brightness_last_value = brightness_value;
     return brightnessMatrix;
@@ -301,7 +300,7 @@ function gray(originalMatrix, width, height) {
     return grayMatrix;
 }
 
-function binarize(originalMatrix, width, height,limiar) {
+function binarize(originalMatrix, width, height, limiar) {
     const binayMatrix = [];
     for (let i = 0; i < height; i++) {
         binayMatrix[i] = [];
@@ -318,7 +317,7 @@ function binarize(originalMatrix, width, height,limiar) {
     return binayMatrix;
 }
 
-function sum(width, height,workingMatrix1,workingMatrix2){
+function sum(width, height, workingMatrix1, workingMatrix2) {
     matrix1 = workingMatrix1
     matrix2 = workingMatrix2
 
