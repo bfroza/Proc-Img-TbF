@@ -136,10 +136,7 @@ function applyFilter(filterType) {
     ctx.drawImage(img, 0, 0);
     const imageData = ctx.getImageData(0, 0, width, height);
     let modifiedMatrix = [];
-    const originalMatrix = workingMatrix;
-
-    
-    
+    const originalMatrix = workingMatrix;   
 
 
 
@@ -155,10 +152,6 @@ function applyFilter(filterType) {
             return (false);
         }
     }
-
-
-
-
 
 
 
@@ -180,12 +173,15 @@ function applyFilter(filterType) {
             return;
         case 'brightness':
             const brightness_value = document.getElementById('range_brightness').value;
+            console.log(brightness_value);
             modifiedMatrix = brightness(workingMatrix, width, height, brightness_value);
             workingMatrix = modifiedMatrix;
             document.getElementById('modifiedImage').src = max_min(modifiedMatrix, width, height, brightness_value);
             return;
         case 'sum':
-            modifiedMatrix = sum(width, height, workingMatrix1, workingMatrix2);
+            console.log(workingMatrix);
+            console.log(workingMatrix1);
+            modifiedMatrix = sum(width, height, workingMatrix, workingMatrix1);
             workingMatrix = modifiedMatrix;
             document.getElementById('modifiedImage').src = matrixToDataURL(modifiedMatrix, width, height);
             return;
@@ -227,22 +223,28 @@ function max_min(modifiedMatrix, width, height) {
     for (let i = 0; i < height; i++) {
         for (let j = 0; j < width; j++) {
             if (modifiedMatrix[i][j][0] < minValueRed) minValueRed = modifiedMatrix[i][j][0];
-            if (modifiedMatrix[i][j][0] < minValueGreen) minValueGreen = modifiedMatrix[i][j][1];
-            if (modifiedMatrix[i][j][0] < minValueBlue) minValueBlue = modifiedMatrix[i][j][2];
+            if (modifiedMatrix[i][j][1] < minValueGreen) minValueGreen = modifiedMatrix[i][j][1];
+            if (modifiedMatrix[i][j][2] < minValueBlue) minValueBlue = modifiedMatrix[i][j][2];
             if (modifiedMatrix[i][j][0] > maxValueRed) maxValueRed = modifiedMatrix[i][j][0];
-            if (modifiedMatrix[i][j][0] > maxValueGreen) maxValueGreen = modifiedMatrix[i][j][1];
-            if (modifiedMatrix[i][j][0] > maxValueBlue) maxValueBlue = modifiedMatrix[i][j][2];
+            if (modifiedMatrix[i][j][1] > maxValueGreen) maxValueGreen = modifiedMatrix[i][j][1];
+            if (modifiedMatrix[i][j][2] > maxValueBlue) maxValueBlue = modifiedMatrix[i][j][2];
         }
     }
-    
+    console.log(minValueRed);
+    console.log(maxValueRed);
     for (let i = 0; i < height; i++) {
         normalizedMatrix[i] = [];
         for (let j = 0; j < width; j++) {
-            normalizedMatrix[i][j][0] = (255 / (maxValueRed - minValueRed))*(normalizedMatrix[i][j][0] - minValueRed);
-            normalizedMatrix[i][j][1] = (255 / (maxValueGreen - minValueGreen))*(normalizedMatrix[i][j][1] - minValueGreen);
-            normalizedMatrix[i][j][2] = (255 / (maxValueBlue - minValueBlue))*(normalizedMatrix[i][j][2] - minValueBlue);
+            normalizedMatrix[i][j] = [];
+            normalizedMatrix[i][j][0] = parseInt((255 / (maxValueRed - minValueRed))*(modifiedMatrix[i][j][0] - minValueRed));
+            normalizedMatrix[i][j][1] = parseInt((255 / (maxValueGreen - minValueGreen))*(modifiedMatrix[i][j][1] - minValueGreen));
+            normalizedMatrix[i][j][2] = parseInt((255 / (maxValueBlue - minValueBlue))*(modifiedMatrix[i][j][2] - minValueBlue));
+            normalizedMatrix[i][j][3] = modifiedMatrix[i][j][3];
         }
     }
+    console.log(modifiedMatrix[100][100]);
+    console.log(normalizedMatrix[100][100]);
+
     return matrixToDataURL(normalizedMatrix, width, height);
 }
 
