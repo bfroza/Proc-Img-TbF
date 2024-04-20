@@ -44,6 +44,12 @@ document.addEventListener("DOMContentLoaded", function () {
         applyFilter('brightness');
     });
 
+    
+    document.getElementById('pop-up-button-ok').addEventListener('click', function () {
+        applyFilter('brightness');
+    });
+
+
     document.getElementById('range_binarize').addEventListener('change', function () {
         document.getElementById('binarize_label').innerText = document.getElementById('range_binarize').value;
     });
@@ -55,6 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('negativeButton').addEventListener('click', function () {
         applyFilter('negative');
     });
+
 
     document.getElementById('grayButton').addEventListener('click', function () {
         applyFilter('gray');
@@ -86,6 +93,10 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('secundaryButton').addEventListener('click', function () {        
         document.getElementById("display").classList.toggle("hidden");
         teste = true
+    });
+
+    document.getElementById('pop-up-button-cancel').addEventListener('click', function () {
+        applyFilter('normal');
     });
 });
 
@@ -139,20 +150,18 @@ function applyFilter(filterType) {
     const originalMatrix = workingMatrix;   
 
 
-
-    if (teste) {
+    if(teste){
         const height1 = workingMatrix1.length;
         const width1 = workingMatrix1[0].length;
 
         const height2 = workingMatrix2.length;
         const width2 = workingMatrix2[0].length;
 
-        if (height1 != height2 && width1 != width2) {
-            Swal.fire("", "As dimensões das imagens tem q ser a mesma", "warning");
-            return (false);
+        if(height1 != height2 && width1 != width2 ){
+        Swal.fire("", "As dimensões das imagens tem q ser a mesma", "warning");
+        return (false);
         }
     }
-
 
 
     switch (filterType) {
@@ -176,11 +185,9 @@ function applyFilter(filterType) {
             console.log(brightness_value);
             modifiedMatrix = brightness(workingMatrix, width, height, brightness_value);
             workingMatrix = modifiedMatrix;
-            document.getElementById('modifiedImage').src = max_min(modifiedMatrix, width, height, brightness_value);
+            document.getElementById('modifiedImage').src = matrixToDataURL(modifiedMatrix, width, height, brightness_value);
             return;
         case 'sum':
-            console.log(workingMatrix);
-            console.log(workingMatrix1);
             modifiedMatrix = sum(width, height, workingMatrix, workingMatrix1);
             workingMatrix = modifiedMatrix;
             document.getElementById('modifiedImage').src = matrixToDataURL(modifiedMatrix, width, height);
@@ -211,43 +218,53 @@ function applyFilter(filterType) {
     document.getElementById('modifiedImage').src = matrixToDataURL(modifiedMatrix, width, height);
 }
 
-function max_min(modifiedMatrix, width, height) {
-    let minValueRed = modifiedMatrix[0][0][0];
-    let maxValueRed = modifiedMatrix[0][0][0];
-    let minValueGreen = modifiedMatrix[0][0][1];
-    let maxValueGreen = modifiedMatrix[0][0][1];
-    let minValueBlue = modifiedMatrix[0][0][2];
-    let maxValueBlue = modifiedMatrix[0][0][2];
-    const normalizedMatrix = [];
+// function max_min(modifiedMatrix, width, height) {
+//     let minValueRed = modifiedMatrix[0][0][0];
+//     let maxValueRed = modifiedMatrix[0][0][0];
+//     let minValueGreen = modifiedMatrix[0][0][1];
+//     let maxValueGreen = modifiedMatrix[0][0][1];
+//     let minValueBlue = modifiedMatrix[0][0][2];
+//     let maxValueBlue = modifiedMatrix[0][0][2];
+//     const normalizedMatrix = [];
 
-    for (let i = 0; i < height; i++) {
-        for (let j = 0; j < width; j++) {
-            if (modifiedMatrix[i][j][0] < minValueRed) minValueRed = modifiedMatrix[i][j][0];
-            if (modifiedMatrix[i][j][1] < minValueGreen) minValueGreen = modifiedMatrix[i][j][1];
-            if (modifiedMatrix[i][j][2] < minValueBlue) minValueBlue = modifiedMatrix[i][j][2];
-            if (modifiedMatrix[i][j][0] > maxValueRed) maxValueRed = modifiedMatrix[i][j][0];
-            if (modifiedMatrix[i][j][1] > maxValueGreen) maxValueGreen = modifiedMatrix[i][j][1];
-            if (modifiedMatrix[i][j][2] > maxValueBlue) maxValueBlue = modifiedMatrix[i][j][2];
-        }
-    }
-    console.log(minValueRed);
-    console.log(maxValueRed);
-    for (let i = 0; i < height; i++) {
-        normalizedMatrix[i] = [];
-        for (let j = 0; j < width; j++) {
-            normalizedMatrix[i][j] = [];
-            normalizedMatrix[i][j][0] = parseInt((255 / (maxValueRed - minValueRed))*(modifiedMatrix[i][j][0] - minValueRed));
-            normalizedMatrix[i][j][1] = parseInt((255 / (maxValueGreen - minValueGreen))*(modifiedMatrix[i][j][1] - minValueGreen));
-            normalizedMatrix[i][j][2] = parseInt((255 / (maxValueBlue - minValueBlue))*(modifiedMatrix[i][j][2] - minValueBlue));
-            normalizedMatrix[i][j][3] = modifiedMatrix[i][j][3];
-        }
-    }
-    console.log(modifiedMatrix[100][100]);
-    console.log(normalizedMatrix[100][100]);
+//     for (let i = 0; i < height; i++) {
+//         for (let j = 0; j < width; j++) {
+//             if (modifiedMatrix[i][j][0] < minValueRed) minValueRed = modifiedMatrix[i][j][0];
+//             if (modifiedMatrix[i][j][1] < minValueGreen) minValueGreen = modifiedMatrix[i][j][1];
+//             if (modifiedMatrix[i][j][2] < minValueBlue) minValueBlue = modifiedMatrix[i][j][2];
+//             if (modifiedMatrix[i][j][0] > maxValueRed) maxValueRed = modifiedMatrix[i][j][0];
+//             if (modifiedMatrix[i][j][1] > maxValueGreen) maxValueGreen = modifiedMatrix[i][j][1];
+//             if (modifiedMatrix[i][j][2] > maxValueBlue) maxValueBlue = modifiedMatrix[i][j][2];
+//         }
+//     }
+//     console.log(minValueRed);
+//     console.log(maxValueRed);
+//     for (let i = 0; i < height; i++) {
+//         normalizedMatrix[i] = [];
+//         for (let j = 0; j < width; j++) {
+//             normalizedMatrix[i][j] = [];
+//             normalizedMatrix[i][j][0] = parseInt((255 / (maxValueRed - minValueRed))*(modifiedMatrix[i][j][0] - minValueRed));
+//             normalizedMatrix[i][j][1] = parseInt((255 / (maxValueGreen - minValueGreen))*(modifiedMatrix[i][j][1] - minValueGreen));
+//             normalizedMatrix[i][j][2] = parseInt((255 / (maxValueBlue - minValueBlue))*(modifiedMatrix[i][j][2] - minValueBlue));
+//             normalizedMatrix[i][j][3] = modifiedMatrix[i][j][3];
+//         }
+//     }
+//     console.log(modifiedMatrix[100][100]);
+//     console.log(normalizedMatrix[100][100]);
 
-    return matrixToDataURL(normalizedMatrix, width, height);
+//     return matrixToDataURL(normalizedMatrix, width, height);
+// }
+
+function truncate(value) {
+    if (value > 255) {
+        value = 255;
+    }
+    if (value < 0) {
+        value = 0
+    }
+
+    return value;
 }
-
 function matrixToDataURL(modifiedMatrix, width, height) {
     const canvas = document.getElementById('canvas');
     canvas.width = width;
@@ -349,7 +366,7 @@ function sum(width, height, workingMatrix1, workingMatrix2) {
             const green = workingMatrix1[i][j][1] + workingMatrix2[i][j][1];
             const blue = workingMatrix1[i][j][2] + workingMatrix2[i][j][2];
             const alpha = workingMatrix1[i][j][3];
-            sumMatrix[i][j] = [max_min(red), max_min(green), max_min(blue), alpha];
+            sumMatrix[i][j] = [truncate(red), truncate(green), truncate(blue), alpha];
         }
     }
     return sumMatrix;
@@ -372,3 +389,13 @@ function downloadImage() {
 }
 
 document.getElementById('downloadButton').addEventListener('click', downloadImage);
+
+function openPopup() {
+    var popup = document.getElementById("popup");
+    popup.style.display = "block";
+}
+
+function closePopup() {
+    var popup = document.getElementById("popup");
+    popup.style.display = "none";
+}

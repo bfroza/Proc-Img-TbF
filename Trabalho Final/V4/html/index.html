@@ -50,7 +50,7 @@
           <button id="negativeButton" type="button">Negativo</button>
           <button id="grayButton" type="button">Escala de Cinza</button>
           <button id="sumButton" type="button">Somar Imagens</button>
-    
+          <button onclick="openPopup()">Abrir Pop-up</button>
           <button id="normalButton" type="button">Normal</button>
           <button id="secundaryButton">Imagem Secundária</button>
           <div class="div">
@@ -61,9 +61,17 @@
           </div>
           
 
-          <h3>Alterar Luminosidade</h3>
-          <p id="brightness_label">0</p>
-          <input type="range" name="" id="range_brightness" value="0" min="-255" max="255">
+          <div id="popup" class="popup">
+            <h1>Pop-up Phothopobre</h1>
+            <h3>Brilho</h3>
+            <p id="brightness_label">0</p>
+            <input type="range" name="range_brightness" id="range_brightness" value="0" min="-255" max="255">
+            <h3>Contraste </h3>
+            <p id="contraste_label">0</p>
+            <input type="range" name="range_contraste" id="range_contraste" value="0" min="-255" max="255">
+            <button id="pop-up-button-ok">OK</button>
+            <button id="pop-up-button-cancel" onclick="closePopup()">Cancelar</button>
+        </div>
           <h3>Binarização </h3>
           <p id="binarize_label">128</p>
           <input type="range" name="" id="range_binarize" value="128" min="0" max="255">

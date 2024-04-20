@@ -195,11 +195,6 @@ body {
     margin-right: 0; 
 }
 
-
-#range_brightness, #range_binarize{
-  width: 200px;
-
-}
 .button-download{
   padding-top: 20px;
 }
@@ -208,3 +203,46 @@ body {
   display: none;
 }
 
+
+.popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 10px; /* Reduzido o valor de padding */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
+  z-index: 9999;
+  text-align: center; 
+}
+
+.popup input[type="range"] {
+  width: 80%; /* Reduzida a largura do input range */
+  margin: 5px auto; /* Reduzido o valor do margin */
+  display: block; 
+}
+
+.popup button {
+  margin-top: 30px;
+  margin: 5px; 
+  padding: 5px 10px; 
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform ease-in-out 500ms;
+}
+
+.popup button:hover {
+  background-color: #0056b3;
+  transform: scale(1.1);
+  transition: transform ease-in-out 500ms;
+}
+
+#pop-up-button-ok{
+  margin-top: 30px;
+}
