@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhotoPobre</title>
+    <link rel="stylesheet" href="../css/style.css">
+
+    <script type="module" src="../js/script.js" defer></script>
+    <link rel="shortcut icon" href="../img/editar.png" type="image/x-icon">
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+    <script src="../js/sweetalert2.all.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+
+<body>
+    <header id="header-page" class="nav-bar">
+        <div id="left-icon">
+            <a href="../html/index.html"><img src="../img/imagem.png" alt=""></a>
+        </div>
+
+
+        <ul>
+            <li class="dropdown"><a href="#" class="dropbtn">Início</a>
+                <div class="dropdown-content">
+                    <a href="#" id="drop-recover">Restaurar imagem</a>
+                </div></a>
+            </li>
+
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Ajustes</a>
+                <div class="dropdown-content">
+                    <a href="#" onclick="openPopup('popup-brightness')">Brilho</a>
+                    <a href="#" onclick="openPopup('')">Contraste</a>
+                    <div class="submenu">
+                        <a href="#">Máscara 3x3</a>
+                        <div class="submenu-content">
+                            <a href="#" onclick="openPopup('')">Mínimo</a>
+                            <a href="#" onclick="openPopup('')">Máximo</a>
+                            <a href="#" onclick="openPopup('')">Média</a>
+                        </div>
+                    </div>
+                    <div class="submenu">
+                        <a href="#">Máscara 5x5</a>
+                        <div class="submenu-content">
+                            <a href="#" onclick="openPopup('')">Mínimo</a>
+                            <a href="#" onclick="openPopup('')">Máximo</a>
+                            <a href="#" onclick="openPopup('')">Média</a>
+                        </div>
+                    </div>
+                    <div class="submenu">
+                        <a href="#">Máscara 7x7</a>
+                        <div class="submenu-content">
+                            <a href="#" onclick="openPopup('')">Mínimo</a>
+                            <a href="#" onclick="openPopup('')">Máximo</a>
+                            <a href="#" onclick="openPopup('')">Média</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+
+
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Cores</a>
+                <div class="dropdown-content">
+                    <a href="#" id="drop-negative">Negativo</a>
+                    <a href="#" id="drop-gray">Escala de Cinza</a>
+                    <a href="#" onclick="openPopup('popup-binarize')">Limiarizar</a>
+                </div>
+            </li>
+
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Imagem</a>
+                <div class="dropdown-content">
+                    <div class="submenu">
+                        <a href="#">Operações com duas imagens</a>
+                    </div>
+                    <div class="submenu">
+                        <a href="#">Somar</a>
+                        <div class="submenu-content">
+                            <a href="#" onclick="openPopup('popup-soma-constante')">Soma constante</a>
+                            <a href="#" onclick="openPopup('')">Somar imagens</a>
+                        </div>
+                    </div>
+                    <div class="submenu">
+                        <a href="#">Multiplicar</a>
+                        <div class="submenu-content">
+                            <a href="#" onclick="openPopup('')">Multiplicação constante</a>
+                            <a href="#" onclick="openPopup('')">Multiplicação imagens</a>
+                        </div>
+                    </div>
+                    <div class="submenu">
+                        <a href="#">Dividir</a>
+                        <div class="submenu-content">
+                            <a href="#" onclick="openPopup('')">Divisão constante</a>
+                            <a href="#" onclick="openPopup('')">Divisão imagens</a>
+                        </div>
+                    </div>
+
+
+                    <div class="submenu">
+                        <a href="#" onclick="openPopup('')">Recortar</a>
+                        <div class="submenu-content">
+                            <a href="#">Recortar input</a>
+                            <a href="#">Recortar seleção</a>
+                        </div>
+                    </div>
+                    <div class="submenu">
+                        <a href="#" onclick="openPopup('rotate')">Girar</a>
+                        <div class="submenu-content">
+                            <a href="#">Sentido horário</a>
+                            <a href="#">Sentido anti-horário</a>
+                        </div>
+                    </div>
+                    <div class="submenu">
+                        <a href="#" onclick="openPopup('flip')">Virar</a>
+                        <div class="submenu-content">
+                            <a href="#">Horizontal</a>
+                            <a href="#">Vertical</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Outras Opções</a>
+                <div class="dropdown-content">
+                    <div class="submenu">
+                        <a href="#">Operações Lógicas</a>
+                        <div class="submenu-content">
+                            <a href="#" onclick="openPopup('')">Operação Not</a>
+                            <a href="#" onclick="openPopup('')">Operação And</a>
+                            <a href="#" onclick="openPopup('')">Operação Or</a>
+                            <a href="#" onclick="openPopup('')">Operação Xor</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </header>
+
+
+    <main class="container">
+        <div class="image-container">
+            <div class="select-img">
+                <h3>Imagem Original</h3>
+                <div class="presentation">
+                    <img id="originalImage" src="../img/Add1.jpg" alt="">
+                    <input type="file" id="fileInput" accept="image/*">
+                    <canvas id="canvas" style="display: none;"></canvas>
+                    <!-- <canvas id="histogram_original"></canvas> -->
+                    <button id="testButton">Teste</button>
+                </div>
+            </div>
+
+
+            <div id="secondary-image" class="select-img hidden">
+                <h3>Imagem Secundária</h3>
+                <div class="presentation">
+                    <img id="originalImage2" src="../img/Add1.jpg" alt="">
+                    <input type="file" id="fileInput_2" accept="image/*">
+                    <canvas id="canvas_2" style="display: none;"></canvas>
+                    <div>
+                        <h4>Operações aritméticas</h4>
+                        <div class="buttons">
+                            <button id="add-button"><b>+</b></button>
+                            <button id="subtract-button"><b>-</b></button>
+                            <button id="multiply-button"><b>*</b></button>
+                            <button id="divide-button"><b>/</b></button>
+                        </div>
+                        <div class="buttons">
+                            <button id="media-button"><b>Média</b></button>
+                            <button id="blending-button"><b>Blending</b></button>
+                        </div>
+
+                        <h4>Operações lógicas</h4>
+                        <div class="buttons">
+                            <button id="and-button"><b>AND</b></button>
+                            <button id="or-button"><b>OR</b></button>
+                            <button id="xor-button"><b>XOR</b></button>
+                            <button id="not-button"><b>NOT</b></button>
+                        </div>
+
+                        <div class="buttons" style="margin-top: 30px;">
+                            <button id="ok-secondary-button" style="background-color: green; color: white;"><b>OK</b></button>
+                            <button id="cancel-secondary-button" style="background-color: red; color: white;"><b>Cancelar</b></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="select-img">
+                <h3 id="h2-modified-image">Imagem sem edição</h3>
+                <div class="presentation">
+                    <img id="modifiedImage" class="modified-image" src="../img/Add1.jpg" alt="">
+                    <canvas id="histogram_modified"></canvas>
+                    <div class="button-download">
+                        <button id="downloadButton">Download</button>
+                        <select name="select-tipo-img" id="select-tipo-imgs">
+                            <option value="jpg">JPG</option>
+                            <option value="png">PNG</option>
+                            <option value="tiff">TIFF</option>
+                            <option value="bmp">BMP</option>
+                            <option value="heif">HEIF</option>
+                            <option value="raw">RAW</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- POPUPS -->
+
+
+        <div id="popup-container">
+            <div id="popup-brightness" class="popup">
+                <img id="image-brightness" class="modified-image popup-image" src="" alt="">
+                <h3>Brilho</h3>
+                <p id="brightness_label" class="label-reset">0</p>
+                <input type="range" name="range_brightness" id="range_brightness" class="range-reset" value="0"
+                    min="-255" max="255">
+                <div class="pupop-button">
+                    <button class="popup-ok" data-popup-id="popup-brightness">OK</button>
+                    <button onclick="closePopup()">Cancelar</button>
+                </div>
+            </div>
+
+            <div id="popup-binarize" class="popup">
+                <img id="image-binarize" class="modified-image popup-image" src="" alt="">
+                <h3>Limiarizar</h3>
+                <p id="binarize_label">128</p>
+                <input type="range" name="range_binarize" id="range_binarize" value="128" min="0" max="255">
+                <div class="pupop-button">
+                    <button class="popup-ok" data-popup-id="popup-binarize">OK</button>
+                    <button onclick="closePopup()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="popup-soma-constante" class="popup">
+            <img class="modified-image popup-image" src="" alt="">
+            <h3>Soma Constante</h3>
+            <p id="soma-constante-label" class="label-reset">0</p>
+            <input type="text" id="soma-input">
+            <div class="pupop-button">
+                <button id="popup-ok" class="popup-ok-reset" data-popup-id="popup-soma-constante">OK</button>
+                <button onclick="closePopup()">Cancelar</button>
+            </div>
+        </div>
+
+
+    </main>
+
+    <script src="../js/domManipulation.js"></script>
+
+</body>
+
+</html>

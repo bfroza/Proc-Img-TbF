@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soma de Imagens</title>
+    <script defer>
+        async function loadImageToMatrix(imageElement) {
+            return new Promise((resolve, reject) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                img.onload = function () {
+                    const width = img.naturalWidth;
+                    const height = img.naturalHeight;
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0);
+                    const imageData = ctx.getImageData(0, 0, width, height);
+                    const pixelArray = imageData.data;
+                    const pixelMatrix = [];
+                    for (let i = 0; i < height; i++) {
+                        pixelMatrix[i] = [];
+                        for (let j = 0; j < width; j++) {
+                            const index = (i * width + j) * 4;
+                            const red = pixelArray[index];
+                            const green = pixelArray[index + 1];
+                            const blue = pixelArray[index + 2];
+                            const alpha = pixelArray[index + 3];
+                            pixelMatrix[i][j] = [red, green, blue, alpha];
+                        }
+                    }
+                    resolve(pixelMatrix);
+                };
+                img.src = imageElement.src;
+            });
+        }
+
+        async function sumImages() {
+            const imageElement1 = document.getElementById('originalImage1');
+            const imageElement2 = document.getElementById('originalImage2');
+            const canvas = document.getElementById('canvas2');
+            const ctx = canvas.getContext('2d');
+
+            const matrix1 = await loadImageToMatrix(imageElement1);
+            const matrix2 = await loadImageToMatrix(imageElement2);
+
+            const width = matrix1[0].length;
+            const height = matrix1.length;
+
+            // Verificando se as imagens têm o mesmo tamanho
+            if (width !== matrix2[0].length || height !== matrix2.length) {
+                console.error('As imagens não têm o mesmo tamanho.');
+                return;
+            }
+
+            // Somando as matrizes de pixels
+            const resultMatrix = [];
+            for (let i = 0; i < height; i++) {
+                resultMatrix[i] = [];
+                for (let j = 0; j < width; j++) {
+                    const pixel1 = matrix1[i][j];
+                    const pixel2 = matrix2[i][j];
+                    const red = pixel1[0] + pixel2[0];
+                    const green = pixel1[1] + pixel2[1];
+                    const blue = pixel1[2] + pixel2[2];
+                    const alpha = Math.max(pixel1[3], pixel2[3]); // Usando o alpha máximo entre as duas imagens
+                    resultMatrix[i][j] = [red, green, blue, alpha];
+                }
+            }
+
+            // Desenhando a imagem resultante no canvas
+            canvas.width = width;
+            canvas.height = height;
+            const imageData = ctx.createImageData(width, height);
+            const resultArray = imageData.data;
+            for (let i = 0; i < height; i++) {
+                for (let j = 0; j < width; j++) {
+                    const index = (i * width + j) * 4;
+                    const pixel = resultMatrix[i][j];
+                    resultArray[index] = pixel[0];
+                    resultArray[index + 1] = pixel[1];
+                    resultArray[index + 2] = pixel[2];
+                    resultArray[index + 3] = pixel[3];
+                }
+            }
+            ctx.putImageData(imageData, 0, 0);
+
+            // Atualizando a imagem resultante no elemento HTML
+            const modifiedImage = document.getElementById('modifiedImage');
+            modifiedImage.src = canvas.toDataURL();
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Soma de Imagens</h1>
+    <div class="image-container">
+        <div class="select-img">
+            <h1>Imagem 1</h1>
+            <div class="presentation">
+                <img id="originalImage1" src="" alt="">
+                <label for="fileInput1" class="custom-file-upload">Escolher Arquivo<input type="file"
+                        id="fileInput1" accept="image/*"></label>
+            </div>
+        </div>
+        <div class="select-img">
+            <h1>Imagem 2</h1>
+            <div class="presentation">
+                <img id="originalImage2" src="" alt="">
+                <label for="fileInput2" class="custom-file-upload">Escolher Arquivo<input type="file"
+                        id="fileInput2" accept="image/*"></label>
+            </div>
+        </div>
+        <div class="select-img">
+            <h1>Imagens Juntas</h1>
+            <div class="presentation">
+                <canvas id="canvas2"></canvas>
+                <img id="modifiedImage" class="modified-image" src="" alt="">
+                <button onclick="sumImages()">Somar Imagens</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
