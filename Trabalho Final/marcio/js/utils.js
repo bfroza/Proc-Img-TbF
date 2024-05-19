@@ -1,3 +1,5 @@
+import { imageToMatrix } from "./imageProcessing.js";
+
 const globalVars = {
     recoverMatrix: [],
     previousMatrix: [],
@@ -34,7 +36,9 @@ export function downloadImage() {
     document.body.removeChild(downloadLink);
 }
 
-export function truncate(modifiedMatrix, width, height) {
+export function truncate(modifiedMatrix) {
+    const width = modifiedMatrix[0].length;
+    const height = modifiedMatrix.length;
     const truncatedMatrix = [];
     let value = 0;
     for (let i = 0; i < height; i++) {
@@ -57,7 +61,7 @@ export function truncate(modifiedMatrix, width, height) {
 }
 
 
-function max_min(modifiedMatrix, width, height) {
+export function normalize(modifiedMatrix) {
     let minValueRed = modifiedMatrix[0][0][0];
     let maxValueRed = modifiedMatrix[0][0][0];
     let minValueGreen = modifiedMatrix[0][0][1];
@@ -65,6 +69,9 @@ function max_min(modifiedMatrix, width, height) {
     let minValueBlue = modifiedMatrix[0][0][2];
     let maxValueBlue = modifiedMatrix[0][0][2];
     const normalizedMatrix = [];
+
+    const width = modifiedMatrix[0].length;
+    const height = modifiedMatrix.length;
 
     for (let i = 0; i < height; i++) {
         for (let j = 0; j < width; j++) {
@@ -86,7 +93,7 @@ function max_min(modifiedMatrix, width, height) {
             normalizedMatrix[i][j][3] = modifiedMatrix[i][j][3];
         }
     }
-    return matrixToDataURL(normalizedMatrix, width, height);
+    return normalizedMatrix;
 }
 
 
@@ -109,6 +116,8 @@ export function openSecondaryImage() {
     document.getElementById('fileInput_2').click();
     document.getElementById('header-page').classList.add('disabled');
     setVar('hideSecondaryImage', false);
+    const previousMatrix = imageToMatrix(document.getElementById('originalImage'));
+    setVar('previousMatrix', previousMatrix);
     document.getElementById('originalImage').src = document.getElementById('modifiedImage').src;
 
     const canvas = document.getElementById('canvas');
@@ -120,9 +129,14 @@ export function openSecondaryImage() {
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, width, height);
     document.getElementById('modifiedImage').src = canvas.toDataURL();
+
+    document.querySelectorAll('.secondary-hide').forEach(div => {
+        div.classList.remove('hidden');
+    });
 }
 
 
 export function closeSecondaryImage() {
     document.getElementById('secondary-image').classList.add('hidden');
+    document.getElementById('header-page').classList.remove('disabled');
 }

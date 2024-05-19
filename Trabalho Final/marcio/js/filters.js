@@ -1,5 +1,5 @@
 
-import { getVar, setVar } from "./utils.js";
+import { getVar, normalize, setVar, truncate } from "./utils.js";
 import { imageToMatrix, matrixToDataURL, okFunction } from "./imageProcessing.js";
 
 export function applyFilter(filterType, wildCard) {
@@ -8,7 +8,8 @@ export function applyFilter(filterType, wildCard) {
         'negative': negative,
         'gray': gray,
         'binarize': binarize,
-        'arithmeticOperation': arithmeticOperation
+        'arithmeticOperation': arithmeticOperation,
+        'arithmeticConstantOperation': arithmeticConstantOperation
     };
     const originalMatrix = getVar('workingMatrix');
     const width = originalMatrix[0].length;
@@ -32,7 +33,7 @@ function brightness(originalMatrix, width, height) {
     }
     setVar('filterMatrix', brightnessMatrix);
     setVar('appliedFilter', 'Brilho: ' + brightness_value);
-    document.getElementById('image-brightness').src = matrixToDataURL(brightnessMatrix, width, height);
+    document.getElementById('image-brightness').src = matrixToDataURL(brightnessMatrix);
 }
 
 function negative(originalMatrix, width, height) {
@@ -86,28 +87,90 @@ function binarize(originalMatrix, width, height) {
         }
     }
     setVar('filterMatrix', binaryMatrix);
-    document.getElementById('image-binarize').src = matrixToDataURL(binaryMatrix, width, height);
+    document.getElementById('image-binarize').src = matrixToDataURL(binaryMatrix);
     setVar('appliedFilter', 'Limiarizar: ' + binarize_value);
 }
 
 function arithmeticOperation(originalMatrix, width, height, operator) {
+    const operation = {
+        '+': (a, b) => a + b,
+        '-': (a, b) => a - b,
+        '*': (a, b) => a * b,
+        '/': (a, b) => a / b,
+        'average': (a, b) => {
+            let result = (a + b);
+            if (result > 255) result = 255;
+            result /= 2;
+            return result;
+        },
+        'blending': (a, b) => {
+            const ratio = parseInt(document.getElementById('range-blending').value)/100;
+            let result = ratio * a + (1 - ratio) * b;
+            return result;
+        },
+        'and': (a, b) => a & b,
+        'or': (a, b) => a | b,
+        'xor': (a, b) => a ^ b,
+        'not1': (a, b) => ~a  & 0xFF,
+        'not2': (a, b) => ~b  & 0xFF
+    };
     const operationMatrix = [];
-    const secondaryMatrix = imageToMatrix(document.getElementById('secondary-image'));
-    if (originalMatrix.length != secondaryMatrix.length) {
-        console.log("Imagens de tamanhos diferentes");
-        return
+    const img = new Image();
+    img.src = document.getElementById('originalImage2').src;
+    img.onload = function() {
+        const secondaryMatrix = imageToMatrix(img);
+        
+        if (originalMatrix.length != secondaryMatrix.length) {
+            console.log("Imagens de tamanhos diferentes");
+            return
+        }
+
+        for (let i = 0; i < height; i++) {
+            operationMatrix[i] = [];
+            for (let j = 0; j < width; j++) {
+                operationMatrix[i][j] = [];
+                operationMatrix[i][j][0] = operation[operator] (originalMatrix[i][j][0], secondaryMatrix[i][j][0]);
+                operationMatrix[i][j][1] = operation[operator] (originalMatrix[i][j][1], secondaryMatrix[i][j][1]);
+                operationMatrix[i][j][2] = operation[operator] (originalMatrix[i][j][2], secondaryMatrix[i][j][2]);
+                operationMatrix[i][j][3] = originalMatrix[i][j][3];            
+            }
+        }
+        let normalizedMatrix = [];
+        const selectedValue = document.getElementById('operation-select').value;
+        let textOperation = "";
+        if (selectedValue === 'normalize') {
+            normalizedMatrix = normalize(operationMatrix);
+            textOperation = "Normalizado";
+        } else if (selectedValue === 'truncate') {
+            normalizedMatrix = truncate(operationMatrix);
+            textOperation = "Truncado";
+        }        
+        setVar('filterMatrix', normalizedMatrix);
+        setVar('appliedFilter', 'Operação: ' + operator + " / " + textOperation);
+        document.getElementById('modifiedImage').src = matrixToDataURL(normalizedMatrix);
     }
+}
+
+function arithmeticConstantOperation(originalMatrix, width, height, operator) {
+    const operation = {
+        '+': (a, b) => a + b,
+        '-': (a, b) => a - b,
+        '*': (a, b) => a * b,
+        '/': (a, b) => a / b
+    };
+    const value = parseFloat(document.getElementById('arithmetic-input').value);
+    const operationMatrix = [];
     for (let i = 0; i < height; i++) {
         operationMatrix[i] = [];
         for (let j = 0; j < width; j++) {
-            operationMatrix[i][j][0] = originalMatrix[i][j][0] + secondaryMatrix[i][j][0];
-            operationMatrix[i][j][0] = originalMatrix[i][j][0] + secondaryMatrix[i][j][0];
-            operationMatrix[i][j][0] = originalMatrix[i][j][0] + secondaryMatrix[i][j][0];
-            operationMatrix[i][j][3] = originalMatrix[i][j][3];
-            const alpha = originalMatrix[i][j][3];
-            const grayPixel = (red + green + blue) / 3;
-            let binaryPixel = grayPixel > binarize_value ? 255 : 0;
-            binaryMatrix[i][j] = [binaryPixel, binaryPixel, binaryPixel, alpha];
+            operationMatrix[i][j] = [];
+            operationMatrix[i][j][0] = operation[operator] (originalMatrix[i][j][0], value);
+            operationMatrix[i][j][1] = operation[operator] (originalMatrix[i][j][1], value);
+            operationMatrix[i][j][2] = operation[operator] (originalMatrix[i][j][2], value);
+            operationMatrix[i][j][3] = originalMatrix[i][j][3];            
         }
     }
+        setVar('filterMatrix', operationMatrix);
+        setVar('appliedFilter', 'Op. Aritmética: ' + operator + " " + value);
+        document.getElementById('image-arithmetic').src = matrixToDataURL(operationMatrix);    
 }

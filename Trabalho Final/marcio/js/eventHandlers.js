@@ -1,5 +1,5 @@
 import { imageToMatrix, okFunction, matrixToDataURL } from './imageProcessing.js';
-import { downloadImage, setVar, getVar, openSecondaryImage } from './utils.js';
+import { downloadImage, setVar, getVar, openSecondaryImage, closeSecondaryImage } from './utils.js';
 import { applyFilter } from './filters.js';
 
 
@@ -25,7 +25,6 @@ export function setupEventListeners() {
                 document.getElementById('modifiedImage').src = img.src;
                 const matrix = imageToMatrix(img);
                 setVar("workingMatrix", matrix);
-                setVar("sumMatrix1", matrix);
                 setVar("recoverMatrix", matrix);
                 setVar('appliedFilter', 'Imagem sem edição');
                 document.getElementById('h2-modified-image').innerText = getVar('appliedFilter');
@@ -41,7 +40,7 @@ export function setupEventListeners() {
             img.onload = function() {
                 document.getElementById('originalImage2').src = img.src;
                 const matrix = imageToMatrix(img);
-                setVar("sumMatrix2", matrix);
+                setVar("secondaryMatrix", matrix);
             };
         }
     });
@@ -57,6 +56,10 @@ export function setupEventListeners() {
     document.getElementById('range_binarize').addEventListener('change', function () {        
         document.getElementById('binarize_label').innerText = document.getElementById('range_binarize').value;
         applyFilter('binarize');
+    });
+
+    document.getElementById('range-blending').addEventListener('change', function() {
+        document.getElementById('label-blending').innerText = this.value + "%";
     });
 
 
@@ -76,19 +79,93 @@ export function setupEventListeners() {
         });
     });
 
-    document.getElementById('popup-ok').addEventListener('click', okFunction);
+    // document.getElementById('popup-ok').addEventListener('click', okFunction);
+
+    document.getElementById('cancel-secondary-button').addEventListener('click', function() {
+        closeSecondaryImage();
+        document.getElementById('modifiedImage').src = document.getElementById('originalImage').src
+        const previousMatrix = getVar('previousMatrix');
+        document.getElementById('originalImage').src = matrixToDataURL(previousMatrix);        
+    });
+
+    document.getElementById('ok-secondary-button').addEventListener('click', function() {
+        const elements = document.querySelectorAll('.secondary-hide');
+        elements.forEach(element => {
+            element.classList.add('hidden');
+        });
+        document.getElementById('header-page').classList.remove('disabled');
+        okFunction();
+    });
     
+    document.getElementById('add-button').addEventListener('click', function() {
+        applyFilter('arithmeticOperation', '+')
+    });
+
+    document.getElementById('subtract-button').addEventListener('click', function() {
+        applyFilter('arithmeticOperation', '-')
+    });
+
+    document.getElementById('multiply-button').addEventListener('click', function() {
+        applyFilter('arithmeticOperation', '*')
+    });
+
+    document.getElementById('divide-button').addEventListener('click', function() {
+        applyFilter('arithmeticOperation', '/')
+    });
+
+    document.getElementById('average-button').addEventListener('click', function() {
+        applyFilter('arithmeticOperation', 'average')
+    });
+
+    document.getElementById('blending-button').addEventListener('click', function() {
+        applyFilter('arithmeticOperation', 'blending')
+    });
+
+    document.getElementById('and-button').addEventListener('click', function() {
+        applyFilter('arithmeticOperation', 'and')
+    });
+
+    document.getElementById('or-button').addEventListener('click', function() {
+        applyFilter('arithmeticOperation', 'or')
+    });
+
+    document.getElementById('xor-button').addEventListener('click', function() {
+        applyFilter('arithmeticOperation', 'xor')
+    });
+
+    document.getElementById('not1-button').addEventListener('click', function() {
+        applyFilter('arithmeticOperation', 'not1')
+    });
+
+    document.getElementById('not2-button').addEventListener('click', function() {
+        applyFilter('arithmeticOperation', 'not2')
+    });
+
+    document.getElementById('add-constant-button').addEventListener('click', function() {       
+        applyFilter('arithmeticConstantOperation', '+');
+    });
+
+    document.getElementById('subtract-constant-button').addEventListener('click', function() {       
+        applyFilter('arithmeticConstantOperation', '-');
+    });
+
+    document.getElementById('multiply-constant-button').addEventListener('click', function() {       
+        applyFilter('arithmeticConstantOperation', '*');
+    });
+
+    document.getElementById('divide-constant-button').addEventListener('click', function() {       
+        applyFilter('arithmeticConstantOperation', '/');
+    });
+
 
     //DROPDOWNS
 
     document.getElementById('drop-recover').addEventListener('click', function (event) {
         const recoverMatrix = getVar('recoverMatrix');
-        const recoverWidth = recoverMatrix[0].length;
-        const recoverHeight = recoverMatrix.length;
     
         setVar('workingMatrix', recoverMatrix);
-        document.getElementById('originalImage').src = matrixToDataURL(recoverMatrix, recoverWidth, recoverHeight);
-        document.getElementById('modifiedImage').src = matrixToDataURL(recoverMatrix, recoverWidth, recoverHeight);
+        document.getElementById('originalImage').src = matrixToDataURL(recoverMatrix);
+        document.getElementById('modifiedImage').src = matrixToDataURL(recoverMatrix);
         setVar('appliedFilter', 'Imagem sem edição');
         document.getElementById('h2-modified-image').innerText = getVar('appliedFilter');
     });
@@ -103,6 +180,9 @@ export function setupEventListeners() {
     });
     
 
+    document.getElementById('drop-imgs-operation').addEventListener('click', function() {
+        openSecondaryImage();
+    });
     
 
 

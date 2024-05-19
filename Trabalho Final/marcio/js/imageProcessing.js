@@ -1,9 +1,7 @@
-import { applyFilter } from "./filters.js";
 import { closeSecondaryImage, getVar, resetLabelTexts, resetRangeInputs, setVar, truncate } from "./utils.js";
 
 
 export function imageToMatrix(img) {
-    
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const width = img.naturalWidth;
@@ -31,7 +29,9 @@ export function imageToMatrix(img) {
 }
 
 
-export function matrixToDataURL(modifiedMatrix, width, height) {
+export function matrixToDataURL(modifiedMatrix) {
+    const width = modifiedMatrix[0].length;
+    const height = modifiedMatrix.length;
     const canvas = document.getElementById('canvas');
     canvas.width = width;
     canvas.height = height;
@@ -60,15 +60,11 @@ export function okFunction() {
     const previousMatrix = getVar('workingMatrix');
     const workingMatrix = getVar('filterMatrix');
     setVar('filterMatrix', [])
-    const previousWidth = previousMatrix[0].length;
-    const previousHeight = previousMatrix.length;
-    const workingWidth = workingMatrix[0].length;
-    const workingHeight = workingMatrix.length;
     setVar('previousMatrix', previousMatrix);
-    setVar('workingMatrix', truncate(workingMatrix, workingWidth, workingHeight));
+    setVar('workingMatrix', truncate(workingMatrix));
 
-    document.getElementById('originalImage').src = matrixToDataURL(previousMatrix, previousWidth, previousHeight);
-    document.getElementById('modifiedImage').src = matrixToDataURL(workingMatrix, workingWidth, workingHeight);
+    document.getElementById('originalImage').src = matrixToDataURL(previousMatrix);
+    document.getElementById('modifiedImage').src = matrixToDataURL(workingMatrix);
     document.getElementById('h2-modified-image').innerText = getVar('appliedFilter');
     
     resetRangeInputs();

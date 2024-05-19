@@ -78,31 +78,12 @@
                 <a href="#" class="dropbtn">Imagem</a>
                 <div class="dropdown-content">
                     <div class="submenu">
-                        <a href="#">Operações com duas imagens</a>
+                        <a href="#" id="drop-imgs-operation">Operações com duas imagens</a>
                     </div>
                     <div class="submenu">
-                        <a href="#">Somar</a>
-                        <div class="submenu-content">
-                            <a href="#" onclick="openPopup('popup-soma-constante')">Soma constante</a>
-                            <a href="#" onclick="openPopup('')">Somar imagens</a>
-                        </div>
+                        <a href="#" onclick="openPopup('popup-operacoes-aritmeticas')">Operações aritméticas por valor constante</a>
                     </div>
-                    <div class="submenu">
-                        <a href="#">Multiplicar</a>
-                        <div class="submenu-content">
-                            <a href="#" onclick="openPopup('')">Multiplicação constante</a>
-                            <a href="#" onclick="openPopup('')">Multiplicação imagens</a>
-                        </div>
-                    </div>
-                    <div class="submenu">
-                        <a href="#">Dividir</a>
-                        <div class="submenu-content">
-                            <a href="#" onclick="openPopup('')">Divisão constante</a>
-                            <a href="#" onclick="openPopup('')">Divisão imagens</a>
-                        </div>
-                    </div>
-
-
+                    
                     <div class="submenu">
                         <a href="#" onclick="openPopup('')">Recortar</a>
                         <div class="submenu-content">
@@ -152,7 +133,6 @@
                 <div class="presentation">
                     <img id="originalImage" src="../img/Add1.jpg" alt="">
                     <input type="file" id="fileInput" accept="image/*">
-                    <canvas id="canvas" style="display: none;"></canvas>
                     <!-- <canvas id="histogram_original"></canvas> -->
                     <button id="testButton">Teste</button>
                 </div>
@@ -163,19 +143,21 @@
                 <h3>Imagem Secundária</h3>
                 <div class="presentation">
                     <img id="originalImage2" src="../img/Add1.jpg" alt="">
-                    <input type="file" id="fileInput_2" accept="image/*">
-                    <canvas id="canvas_2" style="display: none;"></canvas>
-                    <div>
+                    <input type="file" id="fileInput_2" accept="image/*" class="secondary-hide">
+                    <div class="secondary-controls secondary-hide">
                         <h4>Operações aritméticas</h4>
                         <div class="buttons">
                             <button id="add-button"><b>+</b></button>
                             <button id="subtract-button"><b>-</b></button>
                             <button id="multiply-button"><b>*</b></button>
                             <button id="divide-button"><b>/</b></button>
+                            <button id="average-button"><b>Média</b></button>
                         </div>
-                        <div class="buttons">
-                            <button id="media-button"><b>Média</b></button>
+                        <div class="buttons" style="flex: 0;">
                             <button id="blending-button"><b>Blending</b></button>
+                            <input type="range" name="range-blending" id="range-blending" value="50" min="0" max="100"
+                                style="width: 50%;">
+                            <label id="label-blending" style="width: 30px;">50%</label>
                         </div>
 
                         <h4>Operações lógicas</h4>
@@ -183,12 +165,20 @@
                             <button id="and-button"><b>AND</b></button>
                             <button id="or-button"><b>OR</b></button>
                             <button id="xor-button"><b>XOR</b></button>
-                            <button id="not-button"><b>NOT</b></button>
+                            <button id="not1-button" style="white-space: nowrap;"><b>NOT 1</b></button>
+                            <button id="not2-button" style="white-space: nowrap;"><b>NOT 2</b></button>
                         </div>
 
-                        <div class="buttons" style="margin-top: 30px;">
-                            <button id="ok-secondary-button" style="background-color: green; color: white;"><b>OK</b></button>
-                            <button id="cancel-secondary-button" style="background-color: red; color: white;"><b>Cancelar</b></button>
+                        <select id="operation-select" style="margin-top: 15px;">
+                            <option value="normalize">Normalizar</option>
+                            <option value="truncate">Truncar</option>
+                        </select>
+
+                        <div class="buttons" style="margin-top: 20px;">
+                            <button id="ok-secondary-button"
+                                style="background-color: green; color: white;"><b>OK</b></button>
+                            <button id="cancel-secondary-button"
+                                style="background-color: red; color: white;"><b>Cancelar</b></button>
                         </div>
                     </div>
                 </div>
@@ -243,20 +233,26 @@
             </div>
         </div>
 
-        <div id="popup-soma-constante" class="popup">
-            <img class="modified-image popup-image" src="" alt="">
-            <h3>Soma Constante</h3>
-            <p id="soma-constante-label" class="label-reset">0</p>
-            <input type="text" id="soma-input">
+        <div id="popup-operacoes-aritmeticas" class="popup">
+            <img id="image-arithmetic" class="modified-image popup-image" src="" alt="">
+            <h3>Operações Aritméticas por Constantes</h3>
+            <input type="text" id="arithmetic-input">
+            <div>
+                <button id="add-constant-button"><b>+</b></button>
+                <button id="subtract-constant-button"><b>-</b></button>
+                <button id="multiply-constant-button"><b>*</b></button>
+                <button id="divide-constant-button"><b>/</b></button>
+            </div>
             <div class="pupop-button">
-                <button id="popup-ok" class="popup-ok-reset" data-popup-id="popup-soma-constante">OK</button>
-                <button onclick="closePopup()">Cancelar</button>
+                <button class="popup-ok" data-popup-id="popup-operacoes-aritmeticas">OK</button>
+                <button class="popup-cancel" onclick="closePopup()">Cancelar</button>
             </div>
         </div>
 
 
     </main>
 
+    <canvas id="canvas" style="display: none;"></canvas>
     <script src="../js/domManipulation.js"></script>
 
 </body>
