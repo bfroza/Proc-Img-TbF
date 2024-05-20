@@ -170,20 +170,42 @@ export function setupEventListeners() {
         document.getElementById('h2-modified-image').innerText = getVar('appliedFilter');
     });
 
-
     document.getElementById('drop-negative').addEventListener('click', function() {
         applyFilter('negative');
     });
 
     document.getElementById('drop-gray').addEventListener('click', function() {
         applyFilter('gray');
-    });
-    
+    });    
 
     document.getElementById('drop-imgs-operation').addEventListener('click', function() {
         openSecondaryImage();
     });
     
+    document.getElementById('drop-flip-horizontal').addEventListener('click', function() {
+        applyFilter('flip', 'horizontal');
+    });
+
+    document.getElementById('drop-flip-vertical').addEventListener('click', function() {
+        applyFilter('flip', 'vertical');
+    });
+
+    document.getElementById('drop-rotate-clockwise').addEventListener('click', function() {
+        applyFilter('rotate', 'horário');
+    });
+
+    document.getElementById('drop-rotate-counterclockwise').addEventListener('click', function() {
+        applyFilter('rotate', 'anti-horário');
+    });
+
+    document.getElementById('drop-crop').addEventListener('click', function() {
+        const image = new Image();
+        image.src = matrixToDataURL(getVar('workingMatrix'));
+        image.onload = function() {
+            document.getElementById('image-crop').src = image.src;
+            applyFilter('crop');
+        };        
+    });
 
 
     // TESTE

@@ -81,28 +81,29 @@
                         <a href="#" id="drop-imgs-operation">Operações com duas imagens</a>
                     </div>
                     <div class="submenu">
-                        <a href="#" onclick="openPopup('popup-operacoes-aritmeticas')">Operações aritméticas por valor constante</a>
+                        <a href="#" onclick="openPopup('popup-operacoes-aritmeticas')">Operações aritméticas por valor
+                            constante</a>
                     </div>
-                    
+
                     <div class="submenu">
                         <a href="#" onclick="openPopup('')">Recortar</a>
                         <div class="submenu-content">
                             <a href="#">Recortar input</a>
-                            <a href="#">Recortar seleção</a>
+                            <a href="#" id="drop-crop" onclick="openPopup('popup-crop')">Recortar seleção</a>
                         </div>
                     </div>
                     <div class="submenu">
                         <a href="#" onclick="openPopup('rotate')">Girar</a>
                         <div class="submenu-content">
-                            <a href="#">Sentido horário</a>
-                            <a href="#">Sentido anti-horário</a>
+                            <a href="#" id="drop-rotate-clockwise">Sentido horário</a>
+                            <a href="#" id="drop-rotate-counterclockwise">Sentido anti-horário</a>
                         </div>
                     </div>
                     <div class="submenu">
                         <a href="#" onclick="openPopup('flip')">Virar</a>
                         <div class="submenu-content">
-                            <a href="#">Horizontal</a>
-                            <a href="#">Vertical</a>
+                            <a href="#" id="drop-flip-horizontal">Horizontal</a>
+                            <a href="#" id="drop-flip-vertical">Vertical</a>
                         </div>
                     </div>
                 </div>
@@ -231,23 +232,35 @@
                     <button onclick="closePopup()">Cancelar</button>
                 </div>
             </div>
+
+            <div id="popup-operacoes-aritmeticas" class="popup">
+                <img id="image-arithmetic" class="modified-image popup-image" src="" alt="">
+                <h3>Operações Aritméticas por Constantes</h3>
+                <input type="text" id="arithmetic-input">
+                <div>
+                    <button id="add-constant-button"><b>+</b></button>
+                    <button id="subtract-constant-button"><b>-</b></button>
+                    <button id="multiply-constant-button"><b>*</b></button>
+                    <button id="divide-constant-button"><b>/</b></button>
+                </div>
+                <div class="pupop-button">
+                    <button class="popup-ok" data-popup-id="popup-operacoes-aritmeticas">OK</button>
+                    <button class="popup-cancel" onclick="closePopup()">Cancelar</button>
+                </div>
+            </div>
+
+            <div id="popup-crop" class="popup">
+                <img id="image-crop" class="modified-image popup-image" src="" alt="">
+                <h3>Recortar imagem</h3>              
+                
+                <div class="pupop-button">
+                    <button class="popup-ok" data-popup-id="popup-crop">OK</button>
+                    <button onclick="closePopup()">Cancelar</button>
+                </div>
+            </div>
         </div>
 
-        <div id="popup-operacoes-aritmeticas" class="popup">
-            <img id="image-arithmetic" class="modified-image popup-image" src="" alt="">
-            <h3>Operações Aritméticas por Constantes</h3>
-            <input type="text" id="arithmetic-input">
-            <div>
-                <button id="add-constant-button"><b>+</b></button>
-                <button id="subtract-constant-button"><b>-</b></button>
-                <button id="multiply-constant-button"><b>*</b></button>
-                <button id="divide-constant-button"><b>/</b></button>
-            </div>
-            <div class="pupop-button">
-                <button class="popup-ok" data-popup-id="popup-operacoes-aritmeticas">OK</button>
-                <button class="popup-cancel" onclick="closePopup()">Cancelar</button>
-            </div>
-        </div>
+        
 
 
     </main>

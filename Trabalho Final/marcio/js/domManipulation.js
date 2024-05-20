@@ -3,7 +3,7 @@ function openPopup(id) {
     document.getElementById(id).style.display = 'block';
 
     document.querySelectorAll('.popup-image').forEach(image => {
-        image.src =  document.getElementById("modifiedImage").src;
+        image.src = document.getElementById("modifiedImage").src;
     });}
 
 function closePopup() {

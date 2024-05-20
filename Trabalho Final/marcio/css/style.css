@@ -207,6 +207,7 @@ a:hover {
 .popup img {
     max-width: 1000px;
     max-height: 600px;
+    min-width: 300px;
 }
 
 
