@@ -1,4 +1,4 @@
-import { closeSecondaryImage, getVar, resetLabelTexts, resetRangeInputs, setVar, truncate } from "./utils.js";
+import { closeSecondaryImage, getVar, resetLabelTexts, resetRangeInputs, resizeImage, setVar, truncate } from "./utils.js";
 
 
 export function imageToMatrix(img) {
@@ -66,6 +66,8 @@ export function okFunction() {
     document.getElementById('originalImage').src = matrixToDataURL(previousMatrix);
     document.getElementById('modifiedImage').src = matrixToDataURL(workingMatrix);
     document.getElementById('h2-modified-image').innerText = getVar('appliedFilter');
+
+    resizeImage();
     
     resetRangeInputs();
     resetLabelTexts();

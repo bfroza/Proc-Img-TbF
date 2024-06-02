@@ -7,7 +7,8 @@ const globalVars = {
     filterMatrix: [],
     secondaryMatrix: [],
     appliedFilter: '',
-    hideSecondaryImage: true
+    hideSecondaryImage: true,
+    cropper: ""
 };
 
 
@@ -139,4 +140,23 @@ export function openSecondaryImage() {
 export function closeSecondaryImage() {
     document.getElementById('secondary-image').classList.add('hidden');
     document.getElementById('header-page').classList.remove('disabled');
+}
+
+
+export function resizeImage() {
+    const images = document.querySelectorAll('.resizable-image');
+    images.forEach(img => {
+        img.onload = function () {
+            const width = img.naturalWidth;
+            const height = img.naturalHeight;
+
+            if (width > height) {
+                img.classList.add('resize-width');
+                img.classList.remove('resize-height');
+            } else {
+                img.classList.add('resize-height');
+                img.classList.remove('resize-width');
+            }
+        };
+    });
 }

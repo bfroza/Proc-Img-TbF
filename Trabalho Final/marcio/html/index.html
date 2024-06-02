@@ -86,10 +86,10 @@
                     </div>
 
                     <div class="submenu">
-                        <a href="#" onclick="openPopup('')">Recortar</a>
+                        <a href="#">Recortar</a>
                         <div class="submenu-content">
-                            <a href="#">Recortar input</a>
-                            <a href="#" id="drop-crop" onclick="openPopup('popup-crop')">Recortar seleção</a>
+                            <a href="#" id="drop-crop" onclick="imageDimensions(); openPopup('popup-crop')">Recortar input</a>
+                            <a href="#" id="drop-cropper" onclick="openPopup('popup-cropper')">Recortar seleção</a>
                         </div>
                     </div>
                     <div class="submenu">
@@ -132,7 +132,7 @@
             <div class="select-img">
                 <h3>Imagem Original</h3>
                 <div class="presentation">
-                    <img id="originalImage" src="../img/Add1.jpg" alt="">
+                    <img id="originalImage" src="../img/Add1.jpg" alt="" class="resizable-image resize-width">
                     <input type="file" id="fileInput" accept="image/*">
                     <!-- <canvas id="histogram_original"></canvas> -->
                     <button id="testButton">Teste</button>
@@ -143,7 +143,7 @@
             <div id="secondary-image" class="select-img hidden">
                 <h3>Imagem Secundária</h3>
                 <div class="presentation">
-                    <img id="originalImage2" src="../img/Add1.jpg" alt="">
+                    <img id="originalImage2" src="../img/Add1.jpg" alt="" class="resizable-image resize-width">
                     <input type="file" id="fileInput_2" accept="image/*" class="secondary-hide">
                     <div class="secondary-controls secondary-hide">
                         <h4>Operações aritméticas</h4>
@@ -152,13 +152,13 @@
                             <button id="subtract-button"><b>-</b></button>
                             <button id="multiply-button"><b>*</b></button>
                             <button id="divide-button"><b>/</b></button>
+                            <button id="divide-abs-button"><b>|-|</b></button>
                             <button id="average-button"><b>Média</b></button>
                         </div>
                         <div class="buttons" style="flex: 0;">
                             <button id="blending-button"><b>Blending</b></button>
-                            <input type="range" name="range-blending" id="range-blending" value="50" min="0" max="100"
-                                style="width: 50%;">
-                            <label id="label-blending" style="width: 30px;">50%</label>
+                            <input type="range" name="range-blending" id="range-blending" value="50" min="0" max="100">
+                            <label id="label-blending">50%</label>
                         </div>
 
                         <h4>Operações lógicas</h4>
@@ -170,16 +170,14 @@
                             <button id="not2-button" style="white-space: nowrap;"><b>NOT 2</b></button>
                         </div>
 
-                        <select id="operation-select" style="margin-top: 15px;">
+                        <select id="operation-select">
                             <option value="normalize">Normalizar</option>
                             <option value="truncate">Truncar</option>
                         </select>
 
-                        <div class="buttons" style="margin-top: 20px;">
-                            <button id="ok-secondary-button"
-                                style="background-color: green; color: white;"><b>OK</b></button>
-                            <button id="cancel-secondary-button"
-                                style="background-color: red; color: white;"><b>Cancelar</b></button>
+                        <div class="buttons">
+                            <button id="ok-secondary-button"><b>OK</b></button>
+                            <button id="cancel-secondary-button"><b>Cancelar</b></button>
                         </div>
                     </div>
                 </div>
@@ -188,7 +186,7 @@
             <div class="select-img">
                 <h3 id="h2-modified-image">Imagem sem edição</h3>
                 <div class="presentation">
-                    <img id="modifiedImage" class="modified-image" src="../img/Add1.jpg" alt="">
+                    <img id="modifiedImage" class="resizable-image modified-image resize-width" src="../img/Add1.jpg" alt="">
                     <canvas id="histogram_modified"></canvas>
                     <div class="button-download">
                         <button id="downloadButton">Download</button>
@@ -211,7 +209,7 @@
 
         <div id="popup-container">
             <div id="popup-brightness" class="popup">
-                <img id="image-brightness" class="modified-image popup-image" src="" alt="">
+                <img id="image-brightness" class="modified-image popup-image resizable-image-popup" src="" alt="">
                 <h3>Brilho</h3>
                 <p id="brightness_label" class="label-reset">0</p>
                 <input type="range" name="range_brightness" id="range_brightness" class="range-reset" value="0"
@@ -223,7 +221,7 @@
             </div>
 
             <div id="popup-binarize" class="popup">
-                <img id="image-binarize" class="modified-image popup-image" src="" alt="">
+                <img id="image-binarize" class="modified-image popup-image resizable-image-popup" src="" alt="">
                 <h3>Limiarizar</h3>
                 <p id="binarize_label">128</p>
                 <input type="range" name="range_binarize" id="range_binarize" value="128" min="0" max="255">
@@ -234,7 +232,7 @@
             </div>
 
             <div id="popup-operacoes-aritmeticas" class="popup">
-                <img id="image-arithmetic" class="modified-image popup-image" src="" alt="">
+                <img id="image-arithmetic" class="modified-image popup-image resizable-image-popup" src="" alt="">
                 <h3>Operações Aritméticas por Constantes</h3>
                 <input type="text" id="arithmetic-input">
                 <div>
@@ -250,18 +248,37 @@
             </div>
 
             <div id="popup-crop" class="popup">
-                <img id="image-crop" class="modified-image popup-image" src="" alt="">
-                <h3>Recortar imagem</h3>              
-                
+                <h3>Recortar imagem</h3>
+                <h4 id="image-dimensions"></h4>
+                <input type="number" id="top-crop" class="input-reset" min="0">
+                <div style="width: 100%; display: flex; align-items: center;">
+                    <input type="number" id="left-crop" class="input-reset" min="0">
+                    <img id="image-crop" class="modified-image popup-image resizable-image-popup" src="" alt="" >
+                    <input type="number" id="right-crop" class="input-reset" min="0">
+                </div>
+                <input type="number" id="bottom-crop" class="input-reset" min="0">
+
                 <div class="pupop-button">
-                    <button class="popup-ok" data-popup-id="popup-crop">OK</button>
+                    <button id="popup-crop-ok" class="popup-ok" data-popup-id="popup-crop">OK</button>
+                    <button onclick="closePopup()">Cancelar</button>
+                </div>
+            </div>
+
+            <div id="popup-cropper" class="popup">
+                <div style="width: 100%;">
+                    <img id="image-cropper" class="modified-image popup-image resizable-image-popup" src="" alt="">
+                </div>
+
+                <h3>Recortar imagem</h3>
+
+                <div class="pupop-button">
+                    <button id="popup-cropper-ok" class="popup-ok" data-popup-id="popup-cropper">OK</button>
                     <button onclick="closePopup()">Cancelar</button>
                 </div>
             </div>
         </div>
 
-        
-
+        </div>
 
     </main>
 

@@ -2,6 +2,8 @@
 import { getVar, normalize, setVar, truncate } from "./utils.js";
 import { imageToMatrix, matrixToDataURL, okFunction } from "./imageProcessing.js";
 
+let cropper;
+
 export function applyFilter(filterType, wildCard) {
     const filterFunctions = {
         'brightness': brightness,
@@ -12,7 +14,8 @@ export function applyFilter(filterType, wildCard) {
         'arithmeticConstantOperation': arithmeticConstantOperation,
         'flip': flip,
         'rotate': rotate,
-        'crop': crop
+        'crop': crop,
+        'cropSelection': cropSelection
     };
     const originalMatrix = getVar('workingMatrix');
     const width = originalMatrix[0].length;
@@ -98,6 +101,7 @@ function arithmeticOperation(originalMatrix, width, height, operator) {
     const operation = {
         '+': (a, b) => a + b,
         '-': (a, b) => a - b,
+        'diffABS': (a, b) => Math.abs(a - b),
         '*': (a, b) => a * b,
         '/': (a, b) => a / b,
         'average': (a, b) => {
@@ -124,7 +128,7 @@ function arithmeticOperation(originalMatrix, width, height, operator) {
         const secondaryMatrix = imageToMatrix(img);
 
         if (originalMatrix.length != secondaryMatrix.length) {
-            console.log("Imagens de tamanhos diferentes");
+            Swal.fire("", "Imagens de tamanhos diferentes", "warning");
             return
         }
 
@@ -224,13 +228,67 @@ function rotate(originalMatrix, width, height, direction) {
     okFunction();
 }
 
-function crop(originalMatrix) {    
-    const image = document.getElementById('image-crop');
-    image.onload = function() {
-        const cropper = new Cropper(image, {
-            // aspectRatio: 1,
-            viewMode: 1
-        });
-    
+function crop(originalMatrix, width, height) {
+    const croppedMatrix = [];
+    let top = parseInt(document.getElementById('top-crop').value);
+    let bottom = parseInt(document.getElementById('bottom-crop').value);
+    let left =parseInt(document.getElementById('left-crop').value);
+    let right = parseInt(document.getElementById('right-crop').value);
+
+    top = isNaN(top) ? 0 : top;
+    bottom = isNaN(bottom) ? 0 : bottom;
+    left = isNaN(left) ? 0 : left;
+    right = isNaN(right) ? 0 : right;
+
+    top = Math.max(0, top);
+    bottom = Math.max(0, bottom);
+    left = Math.max(0, left);
+    right = Math.max(0, right);
+
+    console.log(top, bottom, left, right);
+
+    const newWidth = width - left - right;
+    const newHeight = height - top - bottom;
+
+    if (newWidth < 1 | newHeight < 1) {
+        Swal.fire("Erro", "Valores de corte maiores que a imagem!", "warning");
+        return;
     }
+
+    for (let i = top; i < height - bottom; i++) {
+        croppedMatrix[i - top] = [];
+        for (let j = left; j < width - right; j++) {
+            croppedMatrix[i - top][j - left] = originalMatrix[i][j];
+        }
+    }
+    setVar('filterMatrix', croppedMatrix);
+    setVar('appliedFilter', 'Imagem recortada: ' + (newWidth) + ' x ' + (newHeight) + ' px');
+    okFunction();
+
 }
+
+function cropSelection(originalMatrix) {
+    if (cropper) cropper.destroy();
+    const image = document.getElementById('image-cropper');
+
+    cropper = new Cropper(image, {
+        aspectRatio: NaN,
+        viewMode: 1,
+        crop(event) {
+            const cropData = cropper.getData();
+            const imageWidth = image.naturalWidth;
+            const imageHeight = image.naturalHeight;
+            const pixelsTop = cropData.y;
+            const pixelsBottom = imageHeight - (cropData.y + cropData.height);
+            const pixelsLeft = cropData.x;
+            const pixelsRight = imageWidth - (cropData.x + cropData.width);
+
+            document.getElementById('top-crop').value = pixelsTop;
+            document.getElementById('bottom-crop').value = pixelsBottom;
+            document.getElementById('left-crop').value = pixelsLeft;
+            document.getElementById('right-crop').value = pixelsRight;
+        }
+    });
+
+}
+
