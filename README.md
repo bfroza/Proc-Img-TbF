@@ -11,7 +11,7 @@ O código JavaScript presente neste repositório é responsável por aplicar fil
 ## Como Usar
 
 1. Clone o repositório para sua máquina local.
-2. Abra o arquivo `index.html` em seu navegador.
+2. Abra o arquivo `html/index.html` em seu navegador.
 3. Carregue uma imagem utilizando o botão "Escolher Arquivo".
 4. Aplique os filtros clicando nos botões correspondentes.
 5. Você pode ajustar o brilho da imagem usando o controle deslizante de brilho.
