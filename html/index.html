@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhotoPobre</title>
+    <link rel="stylesheet" href="../css/style.css">
+
+    <script type="module" src="../js/script.js" defer></script>
+    <link rel="shortcut icon" href="../img/editar.png" type="image/x-icon">
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+    <script src="../js/sweetalert2.all.min.js" defer></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+
+<body>
+    <header id="header-page" class="nav-bar">
+        <div id="left-icon">
+            <a href="../html/index.html"><img src="../img/imagem.png" alt=""></a>
+        </div>
+
+
+        <ul>
+            <li class="dropdown"><a href="#" class="dropbtn">Início</a>
+                <div class="dropdown-content">
+                    <a href="#" id="drop-recover">Restaurar imagem</a>
+                </div></a>
+            </li>
+
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Ajustes</a>
+                <div class="dropdown-content">
+                    <a href="#" onclick="setValue(document.getElementById('brightness-range'), 0, 
+                        document.getElementById('brightness-label'));
+                        openPopup('popup-brightness')">Brilho</a>
+                    <a href="#" onclick="setValue(document.getElementById('range-contrast'), 1, 
+                        document.getElementById('contrast-label')); 
+                        openPopup('popup-contrast')">Contraste</a>
+                    <a href="#" id="drop-histogram">Equalização de Histograma</a>
+                    
+
+                </div>
+            </li>
+
+
+
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Cores</a>
+                <div class="dropdown-content">
+                    <a href="#" id="drop-negative">Negativo</a>
+                    <a href="#" id="drop-gray">Escala de Cinza</a>
+                    <a href="#" onclick="setValue(document.getElementById('range_binarize'), 0, 
+                        document.getElementById('binarize_label'));
+                        openPopup('popup-binarize')">Limiarizar</a>
+                </div>
+            </li>
+
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Imagem</a>
+                <div class="dropdown-content">
+                    <div class="submenu">
+                        <a href="#" id="drop-imgs-operation">Operações com duas imagens</a>
+                    </div>
+                    <div class="submenu">
+                        <a href="#" onclick="openPopup('popup-operacoes-aritmeticas')">Operações aritméticas por valor
+                            constante</a>
+                    </div>
+
+                    <div class="submenu">
+                        <a href="#" id="drop-crop" onclick="imageDimensions(); openPopup('popup-crop')">Recortar</a>                        
+                    </div>
+                    <div class="submenu">
+                        <a href="#">Girar</a>
+                        <div class="submenu-content">
+                            <a href="#" id="drop-rotate-clockwise">Sentido horário</a>
+                            <a href="#" id="drop-rotate-counterclockwise">Sentido anti-horário</a>
+                        </div>
+                    </div>
+                    <div class="submenu">
+                        <a href="#">Virar</a>
+                        <div class="submenu-content">
+                            <a href="#" id="drop-flip-horizontal">Horizontal</a>
+                            <a href="#" id="drop-flip-vertical">Vertical</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <li class="dropdown">
+                <a href="#" class="dropbtn">Filtros</a>
+                <div class="dropdown-content">
+                    <div class="submenu">
+                        <a href="#" onclick="resetSelect(document.getElementById('filter-select'));
+                            resetSelect(document.getElementById('mask-select'));
+                            setValue(document.getElementById('filter-input'), 1);
+                            openPopup('popup-filters')">Realce</a>
+                        <a href="#" onclick="resetSelect(document.getElementById('filter-select-border'));
+                        resetSelect(document.getElementById('mask-select-border'));
+                        openPopup('popup-filters-bordas')">Bordas</a> 
+                        <a href="#" onclick="resetSelect(document.getElementById('filter-select-morphology'));
+                        resetSelect(document.getElementById('mask-select-morphology'));
+                        openPopup('popup-filters-morphology')">Morfológicas</a>                         
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </header>
+
+
+
+
+
+
+
+
+
+
+    <main class="container">
+        <div class="image-container">
+            <div class="select-img">
+                <h3>Imagem Original</h3>
+                <div class="presentation">
+                    <img id="originalImage" src="../img/Add1.jpg" alt="" class="resizable-image resize-width">
+                    <canvas id="histogramOriginal"></canvas>
+                    <input type="file" id="fileInput" accept="image/*">
+                    <button id="testButton">Teste</button>
+                </div>
+            </div>
+
+
+            <div id="secondary-image" class="select-img hidden">
+                <h3>Imagem Secundária</h3>
+                <div class="presentation">
+                    <img id="originalImage2" src="../img/Add1.jpg" alt="" class="resizable-image resize-width">
+                    <input type="file" id="fileInput_2" accept="image/*" class="secondary-hide">
+                    <div class="secondary-controls secondary-hide">
+                        <h4>Operações aritméticas</h4>
+                        <div class="buttons">
+                            <button id="add-button"><b>+</b></button>
+                            <button id="subtract-button"><b>-</b></button>
+                            <button id="multiply-button"><b>*</b></button>
+                            <button id="divide-button"><b>/</b></button>
+                            <button id="divide-abs-button"><b>|-|</b></button>
+                            <button id="average-button"><b>Média</b></button>
+                           
+                        </div>
+                        <div class="buttons" >
+                            <input type="range" name="range-blending" id="range-blending" value="50" min="0" max="100">
+                            <label id="label-blending">50%</label>
+                           
+                        </div>
+                        <div class="buttons" style="flex: 0;">
+                            <button id="blending-button"><b>Blending</b></button>
+                            <button id="concatenate-button"><b>Concatenar</b></button>
+                        </div>
+                        <h4>Operações lógicas</h4>
+                        <div class="buttons">
+                            <button id="and-button"><b>AND</b></button>
+                            <button id="or-button"><b>OR</b></button>
+                            <button id="xor-button"><b>XOR</b></button>
+                            <button id="not1-button" style="white-space: nowrap;"><b>NOT 1</b></button>
+                            <button id="not2-button" style="white-space: nowrap;"><b>NOT 2</b></button>
+                        </div>
+
+                        <select id="operation-select">
+                            <option value="normalize">Normalizar</option>
+                            <option value="truncate">Truncar</option>
+                        </select>
+
+                        <div class="buttons">
+                            <button id="ok-secondary-button"><b>OK</b></button>
+                            <button id="cancel-secondary-button"><b>Cancelar</b></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="select-img">
+                <h3 id="h2-modified-image">Imagem sem edição</h3>
+                <div class="presentation">
+                    <img id="modifiedImage" class="resizable-image modified-image resize-width" src="../img/Add1.jpg" alt="">
+                    <canvas id="histogramModified"></canvas>
+                    <div class="button-download">
+                        <button id="downloadButton">Download</button>
+                        <select name="select-tipo-img" id="select-tipo-imgs">
+                            <option value="jpg">JPG</option>
+                            <option value="png">PNG</option>
+                            <option value="tiff">TIFF</option>
+                            <option value="bmp">BMP</option>
+                            <option value="heif">HEIF</option>
+                            <option value="raw">RAW</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+        <!-- POPUPS -->
+
+
+
+
+
+
+        <div id="popup-container">
+            <div id="popup-brightness" class="popup">
+                <img id="image-brightness" class="modified-image popup-image resizable-image-popup" src="" alt="">
+                <h3>Brilho</h3>
+                <p id="brightness-label"></p>
+                <input type="range" name="brightness-range" id="brightness-range"
+                    min="-255" max="255">
+                <div class="popup-button">
+                    <button class="popup-ok" data-popup-id="popup-brightness">OK</button>
+                    <button onclick="closePopup()">Cancelar</button>
+                </div>
+            </div>
+
+            <div id="popup-contrast" class="popup">
+                <img id="image-contrast" class="modified-image popup-image resizable-image-popup" src="" alt="">
+                <h3>Contraste</h3>
+                <p id="contrast-label"></p>
+                <input type="range" name="range-contrast" id="range-contrast" step="0.1"
+                    min="0" max="10">
+                <div class="popup-button">
+                    <button class="popup-ok" data-popup-id="popup-contrast">OK</button>
+                    <button onclick="closePopup()">Cancelar</button>
+                </div>
+            </div>
+
+            <div id="popup-binarize" class="popup">
+                <img id="image-binarize" class="modified-image popup-image resizable-image-popup" src="" alt="">
+                <h3>Limiarizar</h3>
+                <p id="binarize_label">128</p>
+                <input type="range" name="range_binarize" id="range_binarize" value="128" min="0" max="255">
+                <div class="popup-button">
+                    <button class="popup-ok" data-popup-id="popup-binarize">OK</button>
+                    <button onclick="closePopup()">Cancelar</button>
+                </div>
+            </div>
+
+            <div id="popup-operacoes-aritmeticas" class="popup">
+                <img id="image-arithmetic" class="modified-image popup-image resizable-image-popup" src="" alt="">
+                <h3>Operações Aritméticas por Constantes</h3>
+                <input type="text" id="arithmetic-input">
+                <div>
+                    <button id="add-constant-button"><b>+</b></button>
+                    <button id="subtract-constant-button"><b>-</b></button>
+                    <button id="multiply-constant-button"><b>*</b></button>
+                    <button id="divide-constant-button"><b>/</b></button>
+                </div>
+                <div class="popup-button">
+                    <button class="popup-ok" data-popup-id="popup-operacoes-aritmeticas">OK</button>
+                    <button class="popup-cancel" onclick="closePopup()">Cancelar</button>
+                </div>
+            </div>
+
+            <div id="popup-crop" class="popup">
+                <h3>Recortar imagem</h3>
+                <h4 id="image-dimensions"></h4>
+                <input type="number" id="top-crop" class="input-reset" min="0">
+                <div style="width: 100%; display: flex; align-items: center;">
+                    <input type="number" id="left-crop" class="input-reset" min="0">
+                    <img id="image-crop" class="modified-image popup-image resizable-image-popup" src="" alt="" >
+                    <input type="number" id="right-crop" class="input-reset" min="0">
+                </div>
+                <input type="number" id="bottom-crop" class="input-reset" min="0">
+
+                <div class="popup-button">
+                    <button id="popup-crop-ok" class="popup-ok" data-popup-id="popup-crop">OK</button>
+                    <button onclick="closePopup()">Cancelar</button>
+                </div>
+            </div>
+
+            <div id="popup-filters" class="popup">
+                <img id="image-filters" class="modified-image popup-image resizable-image-popup" src="" alt="">
+                <h3>Filtros de Realce</h3>
+                <div style="width: 100%; display: flex; align-items: center; justify-content: space-around;">
+                    <select id="filter-select" onchange="changeLabelAndStep()">
+                        <option value="" disabled selected hidden>Filtro</option>
+                        <option value="min">Mínimo</option>
+                        <option value="max">Máximo</option>
+                        <option value="average">Média</option>
+                        <option value="median">Mediana</option>
+                        <option value="order">Ordem</option>
+                        <option value="conservativeSmoothing">Suavização Conservativa</option>
+                        <option value="gaussian">Gaussiano</option>
+                    </select>
+                
+                    <select id="mask-select">
+                        <option value="" disabled selected hidden>Máscara</option>
+                        <option value="3">3x3</option>
+                        <option value="5">5x5</option>
+                        <option value="7">7x7</option>
+                    </select>
+                
+                    <div id="label-container">
+                        <label id="filter-label" for="filter-input" class="input-label">Ordem:</label>
+                        <input type="number" id="filter-input" min="0" step="1">
+                    </div>
+                    
+                </div>                              
+                <div class="popup-button">
+                    <button class="popup-ok" data-popup-id="popup-filters">OK</button>
+                    <button class="popup-cancel" onclick="closePopup()">Cancelar</button>
+                </div>
+            </div>
+
+            <div id="popup-filters-bordas" class="popup">
+                <img id="image-filters-border" class="modified-image popup-image resizable-image-popup" src="" alt="">
+                <h3>Filtros Detecção de Bordas</h3>
+                <div style="width: 100%; display: flex; align-items: center; justify-content: space-around;">
+                    <select id="filter-select-border">
+                        <option value="" disabled selected hidden>Filtro</option>
+                        <option value="prewitt">Prewitt</option>
+                        <option value="sobel">Sobel</option>
+                        <option value="laplacian">Laplaciano</option>
+                    </select>
+                
+                    <select id="mask-select-border" >
+                        <option value="" disabled selected hidden>Máscara</option>
+                        <option value="3">3x3</option>
+                        <option value="5">5x5</option>
+                        <option value="7">7x7</option>
+                    </select>                   
+                    
+                </div>                              
+                <div class="popup-button">
+                    <button class="popup-ok" data-popup-id="popup-filters-bordas">OK</button>
+                    <button class="popup-cancel" onclick="closePopup()">Cancelar</button>
+                </div>
+            </div>
+
+            <div id="popup-filters-morphology" class="popup">
+                <img id="image-filters-morphology" class="modified-image popup-image resizable-image-popup" src="" alt="">
+                <h3>Filtros Morfológicos</h3>
+                <div style="width: 100%; display: flex; align-items: center; justify-content: space-around;">
+                    <select id="filter-select-morphology"> 
+                        <option value="" disabled selected hidden>Filtro</option>
+                        <option value="dilation">Dilatação</option>
+                        <option value="erosion">Erosão</option>
+                        <option value="opening">Abertura</option>
+                        <option value="closing">Fechamento</option>
+                        <option value="contour">Contorno</option>
+                    </select>
+                
+                    <select id="mask-select-morphology">
+                        <option value="" disabled selected hidden>Máscara</option>
+                        <option value="3">3x3</option>
+                        <option value="5">5x5</option>
+                        <option value="7">7x7</option>
+                    </select>   
+                    
+                </div>                              
+                <div class="popup-button">
+                    <button class="popup-ok" data-popup-id="popup-filters-morphology">OK</button>
+                    <button class="popup-cancel" onclick="closePopup()">Cancelar</button>
+                </div>
+            </div>
+
+        </div>
+
+        </div>
+
+    </main>
+
+    <canvas id="canvas" style="display: none;"></canvas>
+    <script src="../js/domManipulation.js"></script>
+
+</body>
+
+</html>
+
+
