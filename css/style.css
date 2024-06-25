@@ -147,9 +147,7 @@ a:hover {
 }
 
 .select-img button {
-    padding: 1% 2% 2% 1%;
     width: 200px;
-    height: 50px;
     cursor: pointer;
     transition: transform ease-in-out 500ms;
 }
@@ -467,12 +465,16 @@ a:hover {
 
 @media (max-width: 450px) {
 .dropdown {
-    font-size: 0.9rem; /* Diminui o tamanho da fonte dos dropdowns */
+    font-size: 1rem; /* Diminui o tamanho da fonte dos dropdowns */
 }
+
+.dropdown-content a {
+        font-size: 0.9rem; /* Diminui o tamanho da fonte dos dropdowns */
+    }
 .nav-bar ul {
     justify-content: space-between;
       padding-left: 0;
-      gap: 15px;
+      gap: 10px;
   }
   .buttons{
     display: flex;
