@@ -464,3 +464,41 @@ a:hover {
         padding: 15px;
     }
 }
+
+@media (max-width: 450px) {
+.dropdown {
+    font-size: 0.9rem; /* Diminui o tamanho da fonte dos dropdowns */
+}
+.nav-bar ul {
+    justify-content: space-between;
+      padding-left: 0;
+      gap: 15px;
+  }
+  .buttons{
+    display: flex;
+    flex-direction: row;
+  }
+
+  .secondary-controls .buttons {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.secondary-controls .buttons button {
+    flex: 1;
+    margin: 5px;
+    max-width: 48%;
+}
+
+.secondary-controls .buttons input,
+.secondary-controls .buttons select {
+    margin: 10px 0;
+    width: 100%;
+}
+
+.secondary-controls .buttons:last-of-type {
+    flex: none;
+    display: flex;
+    justify-content: space-between;
+}
+}
