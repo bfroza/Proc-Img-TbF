@@ -58,7 +58,7 @@ a:hover {
     display: none;
     position: absolute;
     background-color: #f9f9f9;
-    min-width: 160px;
+    min-width: 90px;
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
 }
 
@@ -296,13 +296,13 @@ a:hover {
 }
 
 .resize-width-popup {
-    width: 500px;
+    width: 390px;
     height: auto;
 }
 
 .resize-height-popup {
     width: auto;
-    height: 500px;
+    height: 450px;
 }
 
 
@@ -373,4 +373,94 @@ a:hover {
 
 #image-crop {
     margin: 20px;
+}
+
+@media (max-width: 768px) {
+    .nav-bar {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .nav-bar ul {
+      justify-content: space-around;
+        padding-left: 0;
+        gap: 30px;
+    }
+
+    .nav-bar ul li {
+        margin: 10px 0;
+    }
+
+    .container {
+        flex-direction: column;
+        padding-top: 60px; /* Adjust for fixed navbar height */
+    }
+
+    .image-container {
+        flex-direction: column;
+    }
+
+    .select-img {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    .select-img img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .select-img .buttons {
+        flex-direction: column;
+    }
+
+    .select-img .buttons button {
+        margin: 10px 0;
+    }
+    .dropdown-content a {
+        font-size: 1rem; /* Diminui o tamanho da fonte dos dropdowns */
+    }
+
+    .image-container {
+        flex-direction: column;
+    }
+
+    .select-img {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    .select-img img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .select-img .buttons {
+        flex-direction: column;
+    }
+
+    .select-img .buttons button {
+        margin: 10px 0;
+    }
+
+    .nav-bar .logo {
+        max-width: 50px; /* Ajusta o tamanho da logo */
+        margin-right: 10px; /* Adiciona margem à direita da logo */
+    }
+
+    .nav-bar {
+        justify-content: space-between; /* Alinha logo e menu dropdown lado a lado */
+    }
+
+    .dropdown {
+        font-size: 1rem; /* Diminui o tamanho da fonte dos dropdowns */
+    }
+    .popup img {
+        border: 1px solid #ddd;
+        width: 330px; /* Ajusta a largura da imagem dentro do popup */
+        height: auto; /* Mantém a proporção da imagem */
+    }
+    .popup{
+        padding: 15px;
+    }
 }
